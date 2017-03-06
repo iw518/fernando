@@ -1,0 +1,168 @@
+html, body
+{
+	padding: 0;
+	margin: 0;
+	background-color: #cccccc;
+}
+
+body
+{
+	background-color: #fff;
+	font-family: Arial, Helvetica, Verdana;
+	font-size: 14px;
+	line-height: 22px;
+	color: #666;
+	position: relative;
+	-webkit-text-size-adjust: none;
+}
+
+body *
+{
+	text-shadow: none;
+}
+h1, h2, h3, h4, h5, h6
+{
+	line-height: 1;
+	font-weight: bold;
+	margin: 20px 0 10px 0;
+}
+h1, h2, h3
+{
+	font-size: 18px;
+}
+h4, h5, h6
+{
+	font-size: 16px;
+}
+p
+{
+	margin: 0 0 10px 0;
+}
+table input{
+	width:100%;
+}
+a, a:link, a:active, a:visited, a:hover
+{
+	color: inherit;
+	text-decoration: underline;
+}
+
+nav:not(.mm-menu)
+{
+	display: none;
+}
+
+/*for the fixed header*/
+.header
+{
+	top: 0;
+	position: fixed;
+}
+.footer
+{
+	bottom: 0;
+	position: fixed;
+}
+
+.header,
+.footer
+{
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;	
+		
+	width: 100%;
+	height: 40px;
+	padding: 0 50px;
+
+	background: #333;
+	text-align: center;
+	font-size: 16px;
+	font-weight: bold;
+	color: #fff;
+	line-height: 40px;
+}
+
+.header_menu a
+{
+	background: center center no-repeat transparent;
+	background-image: url( data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADhJREFUeNpi/P//PwOtARMDHQBdLGFBYtMq3BiHT3DRPU4YR4NrNAmPJuHRJDyahEeT8Ii3BCDAAF0WBj5Er5idAAAAAElFTkSuQmCC );
+
+	display: block;
+	width: 40px;
+	height: 40px;
+	position: absolute;
+	top: 0;
+	left: 10px;
+}
+
+/*
+*header_submenu
+*/
+
+.header_submenu
+{
+	opacity: 0.95;
+	line-height: 10px;
+	font-size: 14px;
+	position: -webkit-sticky;
+	position: sticky;
+	top: 0;
+	z-index: 10;
+}
+
+.header_submenu ul,
+.header_submenu li
+{
+	list-style: none;
+	display: block;
+	padding: 0;
+}
+/*.header_submenu ul
+{
+	border-bottom: 1px solid rgba( 255, 255, 255, 0.5 );
+}
+.header_submenu ul:after
+{
+	content: '';
+	display: block;
+	clear: both;
+}*/
+.header_submenu li
+{
+	margin: 0;
+	float: left;
+}
+.header_submenu a
+{
+	color:#999;
+	text-decoration: none;
+	display: block;
+	padding: 10px 15px;
+	position: relative;
+}
+header_submenu:hover li.selected a:hover,
+.header_submenu a:hover{color:#fff}
+/*.header_submenu:hover li.selected a:hover:after,
+.header_submenu li.selected a:after,
+.header_submenu a:hover:after
+{
+	color:#fff;
+	content: '';
+	background: #fff;
+	display: block;
+	height: 2px;
+	position: absolute;
+	bottom: -1px;
+	left: 15px;
+	right: 15px;
+}
+.header_submenu:hover li.selected a:after
+{
+	content: none;
+}*/
+
+.content
+{
+	padding: 100px 0px 50px 0px;
+	background-color: #cccccc;
+}

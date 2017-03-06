@@ -1,0 +1,65 @@
+<script src="http://cdn.bootcss.com/jquery/2.2.1/jquery.js"></script>
+<script src="http://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='plugin/awesomplete/js/awesomplete.js') }}"></script>
+<script type="text/javascript"
+        src="{{ url_for('static', filename='plugin/mmenu/js/jquery.mmenu.all.min.js') }}"></script>
+<script type="text/javascript">
+    $(function () {
+        $('nav#menu').mmenu({
+            extensions: ['effect-slide-menu', 'pageshadow', "border-offset"],
+            slidingSubmenus: false,
+            searchfield: true,
+            counters: true,
+            setSelected: {
+                hover: true
+            },
+            navbar: {
+                title: '工程勘察数据处理系统'
+            },
+            navbars: [
+                {
+                    position: 'top',
+                    content: [
+                        'prev',
+                        'title',
+                        'close'
+                    ]
+                }, {
+                    position: 'bottom',
+                    content: [
+                        '<a href="http://www.shmged.com" target="_blank">上海海洋地质勘察设计有限公司</a>'
+                    ]
+                }
+            ]
+        });
+    });
+</script>
+
+<script type=text/javascript src="{{ url_for('static', filename='plugin/PrintArea/js/jquery.PrintArea.js') }}"></script>
+{#打印#}
+<script>
+    $('#print').bind('click', function () {
+        $("#printArea").printArea({mode: "iframe"});
+    });
+</script>
+{#切换选项卡#}
+<script type="text/javascript">
+    $(document).ready(function () {
+        //Default Action
+        $(".tab_content").hide(); //Hide all content
+        $("ul.tabs li:first").addClass("active").show(); //Activate first tab
+        $(".tab_content:first").show(); //Show first tab content
+
+        //On Click Event
+        $("ul.tabs li").click(function () {
+            $("ul.tabs li").removeClass("active"); //Remove any "active" class
+            $(this).addClass("active"); //Add "active" class to selected tab
+            $(".tab_content").hide(); //Hide all tab content
+            var activeTab = $(this).find("a").attr("href"); //Find the rel attribute value to identify the active tab + content
+            $(activeTab).fadeIn(); //Fade in the active content
+            return false;
+        });
+    });
+</script>
+<script type="text/javascript"
+        src="{{ url_for('static', filename='plugin/wangEditor/js/wangEditor.min.js') }}"></script>

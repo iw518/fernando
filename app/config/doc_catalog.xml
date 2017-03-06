@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding = "utf-8" ?>
+<root>
+    <files name="依据文件">
+        <file>建设工程勘察合同、中标通知书</file>
+        <file>招标文件、投标文件</file>
+        <file>技术要求、工程勘察任务委托书</file>
+        <file>建筑平面图</file>
+    </files>
+    <files name="方案文件">
+        <file>岩土工程勘察纲要</file>
+        <file>安全、技术质量交底</file>
+        <file>勘察纲要审查意见单</file>
+    </files>
+    <files name="外业及土工文件">
+        <file>钻探记录</file>
+        <file>静力触探数据、标定表</file>
+        <file>其他原位测试</file>
+        <file>小螺纹孔</file>
+        <file>高程测量记录</file>
+        <file>土工试验记录、送样单</file>
+    </files>
+    <files name="内业文件">
+        <file>计算书</file>
+        <file>报告底稿</file>
+        <file>报告审核表</file>
+    </files>
+    <files name="成果文件">
+        <file>成果报告</file>
+        <file>电子光盘</file>
+    </files>
+    <files name="其他文件">
+        <file>外业人员证书</file>
+    </files>
+</root>

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block toolbar %}
+{% endblock %}
+{% block main %}
+    <div id="printArea">
+        {% if project != None %}
+            <div class="row">
+                <div class="col-sm-10 col-sm-offset-1">
+                    <h4 style="text-align: center;"><strong>项目信息</strong></h4>
+                    <p>工程编号：{{ project.nickname }}</p>
+                    <p>工程编号：{{ project.fullname }}</p>
+                    <hr/>
+                </div>
+            </div>
+            <div class="row">
+
+                {% if project.profile.filed>0 %}
+                    <div class="col-sm-2" style="text-align: right">是否归档：</div>是
+                        <span class="col-sm-offset-1">归档时间：{{ project.profile.filed_date }}</span>
+                {% else %}
+                    <div class="col-sm-2" style="text-align: right">是否归档：</div>否
+                {% endif %}
+            </div>
+            <div class="row">
+                <div class="col-sm-2" style="text-align: right">建设单位：</div>
+                {{ project.profile.client  or '' }}
+            </div>
+            <div class="row">
+                <div class="col-sm-2" style="text-align: right">设计单位：</div>
+                {{ project.profile.design  or '' }}
+            </div>
+            <div class="row">
+                <div class="col-sm-2" style="text-align: right">项目规模：</div>
+                {{ project.profile.size  or '' }}
+            </div>
+            {% for registration in project.registrations %}
+                <div class="row">
+                    <div class="col-sm-2" style="text-align: right">{{ registration.findJob() }}：</div>
+                    {{ registration.findUser() }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}

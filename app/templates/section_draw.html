@@ -1,0 +1,58 @@
+{% extends "project_home.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block css %}
+    {{ super() }}
+{% endblock %}
+
+{% block main %}
+    {{ super() }}
+    <ul class="tabs">
+        <li class="active"><a href="#tab1"><i class="fa fa-code"></i>剖面代码</a></li>
+        <li><a href="#tab2"><i class="fa fa-eye" aria-hidden="true"></i>剖面预览</a></li>
+    </ul>
+    <div class="tab_container">
+        <div id="tab1" class="tab_content" style="display: none; ">
+            <div class="row">
+                {% for section in sections %}
+                    <div>
+                        <button type="button" class="btn btn-primary section">
+                            &nbsp;&nbsp;{{ section.name }}
+                        </button>
+                        {% for hole,distance in section.items %}
+                            {{ hole.holeName }} {{ distance }}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <div>孔号</div>
+                <div>间距(m)</div>
+                <div>孔深(m)</div>
+                <div>标高(m)</div>
+                <div>水位(m)</div>
+            </div>
+        </div>
+        <div id="tab2" class="tab_content" style="display: block; ">
+            <div class="row">
+                <div class="col-sm-12">
+                    <svg id='paper' style='width:1000px;height:800px;'></svg>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/snap.svg-min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/custom/section/plotting-section.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/custom/section/data.js') }}"></script>
+    <script>
+    $(".section").bind('click',function () {
+        plotting_section({{ section.to_json()|safe }},{{ layers|safe }});
+
+
+
+    })
+
+    </script>
+{% endblock %}

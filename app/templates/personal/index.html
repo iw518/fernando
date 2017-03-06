@@ -1,0 +1,157 @@
+{% extends "project_home.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block css %}
+    {{ super() }}
+    <style>
+        td, th {
+            white-space: normal !important;
+        }
+
+        {#范围选择器#}
+        tbody tr.parent_row td:nth-child(3) {
+            text-align: left !important;
+        }
+
+        tbody tr.parent_row td:nth-child(n+4):nth-child(-n+8) {
+            text-align: right !important;
+        }
+
+        {#class通配选择器#}
+        tbody tr[class*="child"] td:nth-child(2) {
+            text-align: right !important;
+        }
+
+        tfoot tr td:first-child {
+            text-align: center !important;
+        }
+
+        tfoot tr td:nth-child(n+2):nth-child(-n+6) {
+            text-align: right !important;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    {{ super() }}
+    <div id="printArea">
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1">
+                {#                {{ form.user_selections }}#}
+                {{ wtf.quick_form(form) }}
+                {#                不能将提交按钮直接放在form.py文件中，否则不能用ajax#}
+                <input name='submit' type="submit" value="查询">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1">
+                <table id="tbl_main" class="hor-calculate table-hover" style="table-layout:fixed">
+                    <thead>
+                    <tr>
+                        <th width="4%">序号</th>
+                        <th width="10%">工程编号</th>
+                        <th>工程名称</th>
+                        <th width="8%">累计<br>合同额<br>(万元)</th>
+                        <th width="8%">累计<br>进款额<br>(万元)</th>
+                        <th width="8%">累计合同<br>技术费<br>(元)</th>
+                        <th width="8%">累计进款<br>技术费<br>(元)</th>
+                        <th width="8%">累计实收<br>技术费<br>(元)</th>
+                        <th width="4%">是否<br>归档</th>
+                        <th width="10%">归档时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="3">合计</td>
+                        <td id="fund_contract_sum_all"></td>
+                        <td id="fund_income_sum_all"></td>
+                        <td id="fee_contract_sum_all"></td>
+                        <td id="fee_income_sum_all"></td>
+                        <td id="fee_income_sum_real_all"></td>
+                        <td id="filed_all" colspan="2"></td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script>
+        $(function () {
+            $('[name=submit]:first').click(function () {
+                var myUrl = "{{url_for('personal.index')}}";
+                var myData = {"user_selections": $('#user_selections').val()};
+                var callback_function = function (data) {
+                    {#                    返回的data是字符串形式，必须解析成object格式#}
+                    var projects = JSON.parse(data);
+                    $('#tbl_main:first tbody:first').empty();
+                    for (var i = 0; i < projects.length; i++) {
+                        var project = projects[i];
+                        var row_num = i + 1;
+                        var tdlist = [Number(row_num),
+                            project.nickname,
+                            project.fullname,
+                            (project.fund_contract_sum == null) ? 0 : project.fund_contract_sum.toFixed(4),
+                            (project.fund_income_sum == null) ? 0 : project.fund_income_sum.toFixed(4),
+                            project.fee_contract_sum,
+                            project.fee_income_sum,
+                            project.fee_income_sum_real,
+                            project.filed,
+                            project.filed_date]
+                        var tr = $.map(tdlist, function (value) {
+                            return "<td>" + value + "</td>";
+                        }).join();
+                        var tr = "<tr class='parent_row'>" + tr + "</tr>";
+                        $('#tbl_main:first tbody:first').append(tr);
+                        $('#tbl_main:first tbody:first tr:last').attr('id', "row_" + row_num);
+                        if (project.fee_income_sum_real > 0) {
+                            mylist = project.fee_income_real_list;
+                            for (var j = 0; j < mylist.length; j++) {
+                                $('#tbl_main:first tbody:first').append("<tr><td colspan='7'></td><td>" + mylist[j][0] + "</td><td colspan='2'>" + mylist[j][1] + "</td></tr>");
+                                $('#tbl_main:first tbody:first tr:last').addClass("child_row_" + row_num);
+                            }
+                        }
+                    }
+
+                    for (var i = 1; i <= 5; i++) {
+                        var value_all = 0;
+                        $('#tbl_main:first tbody:first tr.parent_row').each(function (index, item) {
+                            value_all = value_all + Number($(item).find("td:eq(" + Number(i + 2) + ")").text());
+                        })
+                        if (i == 1 || i == 2) {
+                            $('#tbl_main:first tfoot:first tr:first td').eq(i).text(value_all.toFixed(4));
+                        }
+                        else {
+                            $('#tbl_main:first tfoot:first tr:first td').eq(i).text(value_all);
+                        }
+                    }
+                }
+                $.ajax({
+                    url: myUrl,
+                    data: myData,
+                    type: "POST",
+                    dataType: "text",
+                    success: callback_function,
+                    error: function (xhr) {
+                        alert("error");
+                    }
+                });
+            });
+
+
+        });
+    </script>
+    <script type="text/javascript">
+        $(function () {
+            $("#tbl_main:first tbody:first").on("click", "tr.parent_row", function () {
+                $(this)
+                    .toggleClass("selected")
+                    .siblings('.child_' + this.id).toggle();  // 隐藏/显示所谓的子行
+            });
+        })
+    </script>
+{% endblock %}

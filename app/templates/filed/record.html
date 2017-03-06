@@ -1,0 +1,194 @@
+{% extends "project_home.html" %}
+
+{% block css %}
+    {{ super() }}
+{% endblock %}
+
+{% block main %}
+    {{ super() }}
+    <div id="printArea">
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1">
+                <table id="tbl_head">
+                    <tr>
+                        <td colspan="2">
+                            <h4 style="text-align: center;"><strong>上海海洋地质勘察设计有限公司</strong></h4>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <h4 style="text-align: center;"><strong>勘察文件存档目录</strong></h4>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left">
+                            工程编号：<input id="project_nickname" type="text" style="border-width: 0 0 1px 0;width:50%"/>
+                        </td>
+                        <td width="10%">
+                            第&nbsp;&nbsp;&nbsp;&nbsp;包
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left">工程名称：<input id="project_fullname" type="text" style="border-width: 0 0 1px 0;width:50%"/><p></p></td>
+                        <td width="10%">
+                            共<span id="packages">&nbsp;&nbsp;&nbsp;&nbsp;</span>包
+                        </td>
+                    </tr>
+                </table>
+                <table id="tbl_main">
+                    <thead>
+                    <tr>
+                        <th width="10%">资料类别</th>
+                        <th width="5%">编号</th>
+                        <th width="35%">资料名称</th>
+                        <th width="5%">符合性</th>
+                        <th width="5%">封包号</th>
+                        <th width="40%">备注</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for key,value in catalog.items() %}
+                        {% set outer_loop=loop %}
+                        {% if value|length==1 %}
+                            <tr>
+                                <td rowspan="3">{{ key }}</td>
+                                <td>{{ loop.index }}.1</td>
+                                <td>{{ value[0] }}</td>
+                                <td class="file_exsit"></td>
+                                <td><input type="number" name="packages" min="-1" max="10"/></td>
+                                <td><input type="text"></td>
+                            </tr>
+                            {% for item in range(2) %}
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td class="file_exsit"></td>
+                                    <td></td>
+                                    <td><input type="text"></td>
+                                </tr>
+                            {% endfor %}
+                        {% elif value|length>1 %}
+                            {% for item in value %}
+                                <tr>
+                                    {% if loop.index==1 %}
+                                        <td rowspan={{ value|length }}>{{ key }}</td>
+                                    {% endif %}
+                                    <td>{{ outer_loop.index }}.{{ loop.index }}</td>
+                                    <td>{{ item }}</td>
+                                    <td class="file_exsit"></td>
+                                    <td><input type="number" name="packages" min="-1" max="10"/></td>
+                                    <td><input type="text"></td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="6">备注：
+                            <ol>
+                                <li>符合性符号含义："&#10004;"表示该文件存在；"&#10006;"表示必要文件缺失。
+                                </li>
+                                <li>空缺的项目应予以备注。</li>
+                                <li>项目负责人授权书、现场服务日志、验槽、验收记录可归为其他文件。</li>
+                                <li>电子光盘格式为“工程编号（工程名称）（报告编写人）”，包含所有过程文件和最终汇交电子格式。</li>
+                            </ol>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1">
+                归档人：<span id="project_assistant_fullname" style="display:inline-block;width:25%"></span>
+                <span style="display:inline-block;width:25%">接收人：</span>
+                <span>归档日期：<input id="filed_date" type="date" required="required"/></span>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+
+        <div class="col-sm-10 col-sm-offset-1">
+            <button id="submit">确认归档</button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script>
+        $(function () {
+
+            $('#project_nickname').blur(function () {
+
+                var myUrl = "{{url_for('filed.record')}}";
+                var myData = {"type":"query","project_nickname": $('#project_nickname').val()};
+                var callback_function = function (data) {
+                    console.log(data);
+                    $('#project_fullname').val(data['project_fullname']);
+                    $('#project_assistant_fullname').text(data['project_assistant_fullname']);
+                }
+                $.ajax({
+                    url: myUrl,
+                    data: myData,
+                    type: "POST",
+                    dataType: "json",
+                    success: callback_function
+                });
+            });
+
+
+            $('#submit').click(function () {
+
+                //设置控件日期
+                let d = new Date();
+                if ($('#filed_date').val() == '') {
+                    $('#filed_date').val(d.getFullYear() + '-' + Number(d.getMonth()+1) + '-' + d.getDate());
+                }
+
+
+                var myUrl = "{{url_for('filed.record')}}";
+                var myData = {"type":"submit","project_nickname":$('#project_nickname').val(),"filed": $('#packages').text(), "filed_date": $('#filed_date').val()};
+                var callback_function = function (data) {
+                    alert(data["result"]);
+                }
+                $.ajax({
+                    url: myUrl,
+                    data: myData,
+                    type: "POST",
+                    dataType: "json",
+                    success: callback_function
+                });
+            });
+
+
+            let max = 0;
+            $('#tbl_main tbody:first').find('input[type=number]').each(function (index, item) {
+                $(item).bind('change', function () {
+
+                    let num_package = Number($(item).val());
+                    $('#tbl_main').find('input[type=number]').each(function (index2, item2) {
+                        console.log($(item2).val());
+                        let num_package2 = Number($(item2).val());
+                        if (num_package2 >= max) {
+                            max = num_package2;
+                        }
+                    });
+
+                    if (num_package > 0) {
+                        $(item).parent().prev().html('&#10004;');
+                    }
+                    else if (num_package == -1) {
+                        $(item).parent().prev().html('&#10006;');
+                    }
+                    if (num_package == 0) {
+                        $(item).parent().prev().html('');
+                    }
+                    $('#packages').text(max);
+                });
+            });
+        });
+    </script>
+{% endblock %}

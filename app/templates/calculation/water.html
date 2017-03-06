@@ -1,0 +1,59 @@
+{% extends "project_home.html" %}
+
+{% block css %}
+    {{ super() }}
+{% endblock %}
+
+{% block main %}
+    {{ super() }}
+    <div id="printArea">
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1">
+                <h4 style="text-align: center;"><strong>水位表</strong></h4>
+                <p>工程编号：{{ projectNo }}</p>
+                <hr/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1">
+                <table class="ver-minimalist">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    {% for x in range(rank) %}
+                        {% set start=x*factor %}
+                        {% if ((x + 1)*factor)<=cnt %}
+                            {% set end=(x + 1)*factor %}
+                        {% else %}
+                            {% set end=cnt %}
+                        {% endif %}
+                        <tr>
+                            <th>孔号</th>
+                            {% for hole in holes[start:end] %}
+                                <td>{{ hole.holeName }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <th>水位埋深(m)</th>
+                            {% for hole in holes[start:end] %}
+                                <td>{{ '%.2f'%(hole.waterLevel) }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr style="border-bottom: 1px solid #6678b1;">
+                            <th>水位标高(m)</th>
+                            {% for hole in holes[start:end] %}
+                                <td>{{ '%+.2f'%(hole.waterElevation) }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            {% include "sign.html" %}
+        </div>
+    </div>
+{% endblock %}
