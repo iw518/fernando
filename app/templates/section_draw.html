@@ -48,10 +48,9 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/custom/section/data.js') }}"></script>
     <script>
     $(".section").bind('click',function () {
-        plotting_section({{ section.to_json()|safe }},{{ layers|safe }});
-
-
-
+        {% for section in sections %}
+            plotting_sections({{ section.to_json()|safe }}, {{ layers|safe }});
+        {% endfor %}
     })
 
     </script>
