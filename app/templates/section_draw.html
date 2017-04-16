@@ -13,21 +13,14 @@
     <div class="tab_container">
         <div id="tab1" class="tab_content" style="display: none; ">
             <div class="row">
-                {% for section in sections %}
-                    <div>
-                        <button type="button" class="btn btn-primary section">
-                            &nbsp;&nbsp;{{ section.name }}
-                        </button>
-                        {% for hole,distance in section.items %}
-                            {{ hole.holeName }} {{ distance }}
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-                <div>孔号</div>
-                <div>间距(m)</div>
-                <div>孔深(m)</div>
-                <div>标高(m)</div>
-                <div>水位(m)</div>
+                <div class="col-sm-1">
+                    {% for section in sections %}
+                        <div>
+                            <button type="button" class="btn section">{{ section.name }}</button>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="col-sm-11" id="section_expand"></div>
             </div>
         </div>
         <div id="tab2" class="tab_content" style="display: block; ">
@@ -37,21 +30,34 @@
                 </div>
             </div>
         </div>
-
     </div>
 {% endblock %}
 
 {% block script %}
     {{ super() }}
     <script type="text/javascript" src="{{ url_for('static', filename='js/snap.svg-min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/custom/section/plotting-section.js') }}"></script>
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='js/custom/section/plotting-section.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/custom/section/data.js') }}"></script>
     <script>
-    $(".section").bind('click',function () {
-        {% for section in sections %}
-            plotting_sections({{ section.to_json()|safe }}, {{ layers|safe }});
-        {% endfor %}
-    })
+        $(".section").bind('click', function () {
+            {% for section in sections %}
+                if ($(this).text() == "{{ section.name }}") {
+                    plotting_section({{ section.to_json()|safe }}, {{ layers|safe }});
+                    var expand_section = expand_section_info({{ section.to_json()|safe }});
+                    $("#section_expand").empty();
+                    for (var i = 0; i < expand_section.length; i++) {
+                        var expand_hole = "<div style='display:inline-block;vertical-align: top'>";
+                        for (var j = 0; j < expand_section[i].length; j++) {
+                            expand_hole = expand_hole + "<div>" + expand_section[i][j] + "</div>";
+                        }
+                        expand_hole = expand_hole + "</div>";
+                        $("#section_expand").append(expand_hole)
+                    }
+                }
+
+            {% endfor %}
+        })
 
     </script>
 {% endblock %}

@@ -95,9 +95,8 @@ def pile():
                            layers=layers,
                            repeat_layerNolist=repeat_layerNolist
                            )
-    else:
-        hole = SuperList(hole_list).filter('holeName',request.form['hole_selected'])
-        return json.dumps(hole.to_json())
+    hole = SuperList(hole_list).filter('holeName', request.form['hole_selected'])
+    return json.dumps(hole.to_json())
 
 
 # @calculation.route('/pile_calculate')

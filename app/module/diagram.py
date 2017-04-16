@@ -25,8 +25,12 @@ def cpt():
     cpt_list = find_CPT(projectNo)
     hole_list = find_holes_with_layer(projectNo, 2)
     for hole in hole_list:
-        cpt=SuperList(cpt_list).filter("holeName", hole.holeName)
-        hole.testPoints=cpt.points
+        # 防止静力触探孔中无测试数据
+        try:
+            cpt = SuperList(cpt_list).filter("holeName", hole.holeName)
+            hole.testPoints = cpt.points
+        except:
+            continue
     index = None
     if request.method == 'POST':
         probeNo = request.form['probeNo']
