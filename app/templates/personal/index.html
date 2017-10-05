@@ -69,7 +69,7 @@
                         <td id="fee_contract_sum_all"></td>
                         <td id="fee_income_sum_all"></td>
                         <td id="fee_income_sum_real_all"></td>
-                        <td id="filed_all" colspan="2"></td>
+                        <td id="archiving_all" colspan="2"></td>
                     </tr>
                     </tfoot>
                 </table>
@@ -100,8 +100,8 @@
                             project.fee_contract_sum,
                             project.fee_income_sum,
                             project.fee_income_sum_real,
-                            project.filed,
-                            project.filed_date]
+                            project.archiving,
+                            project.archiving_date];
                         var tr = $.map(tdlist, function (value) {
                             return "<td>" + value + "</td>";
                         }).join();
@@ -121,7 +121,7 @@
                         var value_all = 0;
                         $('#tbl_main:first tbody:first tr.parent_row').each(function (index, item) {
                             value_all = value_all + Number($(item).find("td:eq(" + Number(i + 2) + ")").text());
-                        })
+                        });
                         if (i == 1 || i == 2) {
                             $('#tbl_main:first tfoot:first tr:first td').eq(i).text(value_all.toFixed(4));
                         }
@@ -129,7 +129,7 @@
                             $('#tbl_main:first tfoot:first tr:first td').eq(i).text(value_all);
                         }
                     }
-                }
+                };
                 $.ajax({
                     url: myUrl,
                     data: myData,

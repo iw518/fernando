@@ -1,0 +1,84 @@
+{% extends "project_home.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block css %}
+    {{ super() }}
+    <link href="{{ url_for('static',filename='css/jqTree/jqtree.css') }} " rel="stylesheet" type="text/css"/>
+{% endblock %}
+
+{% block main %}
+    {{ super() }}
+    <ul class="tabs">
+        <li class="active"><a href="#tab1"><i class="fa fa-code"></i>剖面代码</a></li>
+        <li><a href="#tab2"><i class="fa fa-eye" aria-hidden="true"></i>剖面预览</a></li>
+    </ul>
+    <div class="tab_container">
+        <div id="tab1" class="tab_content" style="display: none; ">
+            <div class="row">
+                <div class="col-sm-2" id='tree'></div>
+                <div class="col-sm-10" id="section_expand"></div>
+            </div>
+        </div>
+        <div id="tab2" class="tab_content" style="display: block; ">
+            <div class="row">
+                <div class="col-sm-12">
+                    <svg id='paper' style='width:1000px;height:800px;'></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/snap.svg-min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jqTree/tree.jquery.js') }}"></script>
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='js/custom/section/plotting-section.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/custom/section/data.js') }}"></script>
+    <script>
+
+        var data = [
+            {
+                name: '剖面列表',
+                children: [
+                    {% for section in sections %}
+                        {name: '{{ section.name }}'},
+                    {% endfor %}
+                ]
+            }
+        ];
+
+        $(function () {
+            var $tree = $('#tree');
+            $tree.tree({
+                data: data,
+                autoOpen: true,
+                closedIcon: $('<i class="fa fa-arrow-circle-right"></i>'),
+                openedIcon: $('<i class="fa fa-arrow-circle-down"></i>')
+            });
+
+            $tree.on(
+                'tree.click',
+                function (e) {
+                    var selected_node = e.node;
+                    {% for section in sections %}
+                        if (selected_node.name == "{{ section.name }}") {
+                            plotting_section({{ section.to_json()|safe }}, {{ layers|safe }});
+                            var expand_section = expand_section_info({{ section.to_json()|safe }});
+                            $("#section_expand").empty();
+                            for (var i = 0; i < expand_section.length; i++) {
+                                var expand_hole = "<div style='display:inline-block;vertical-align: top'>";
+                                for (var j = 0; j < expand_section[i].length; j++) {
+                                    expand_hole = expand_hole + "<div>" + expand_section[i][j] + "</div>";
+                                }
+                                expand_hole = expand_hole + "</div>";
+                                $("#section_expand").append(expand_hole)
+                            }
+                        }
+                    {% endfor %}
+                }
+            );
+        });
+
+    </script>
+{% endblock %}

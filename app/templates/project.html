@@ -14,9 +14,9 @@
             </div>
             <div class="row">
 
-                {% if project.profile.filed>0 %}
+                {% if project.profile.archiving>0 %}
                     <div class="col-sm-2" style="text-align: right">是否归档：</div>是
-                        <span class="col-sm-offset-1">归档时间：{{ project.profile.filed_date }}</span>
+                    <span class="col-sm-offset-1">归档时间：{{ project.profile.archiving_date }}</span>
                 {% else %}
                     <div class="col-sm-2" style="text-align: right">是否归档：</div>否
                 {% endif %}

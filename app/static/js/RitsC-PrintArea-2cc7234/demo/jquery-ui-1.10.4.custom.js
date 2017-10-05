@@ -2944,7 +2944,7 @@ $.widget("ui.resizable", $.ui.mouse, {
 
 				//TODO: What's that good for? There's not anything to be executed left
 				if(!$(this.handles[i]).length) {
-					continue;
+
 				}
 			}
 		};
@@ -5367,7 +5367,7 @@ $.widget( "ui.accordion", {
 	_destroy: function() {
 		var contents;
 
-		// clean up main element
+        // clean up services element
 		this.element
 			.removeClass( "ui-accordion ui-widget ui-helper-reset" )
 			.removeAttr( "role" );
@@ -6831,7 +6831,7 @@ function Datepicker() {
 	this._disabledInputs = []; // List of date picker inputs that have been disabled
 	this._datepickerShowing = false; // True if the popup picker is showing , false if not
 	this._inDialog = false; // True if showing within a "dialog", false if not
-	this._mainDivId = "ui-datepicker-div"; // The ID of the main datepicker division
+    this._mainDivId = "ui-datepicker-div"; // The ID of the services datepicker division
 	this._inlineClass = "ui-datepicker-inline"; // The name of the inline marker class
 	this._appendClass = "ui-datepicker-append"; // The name of the append marker class
 	this._triggerClass = "ui-datepicker-trigger"; // The name of the trigger marker class
@@ -7817,7 +7817,7 @@ $.extend(Datepicker.prototype, {
 		}
 	},
 
-	/* Update any alternate field to synchronise with the main field. */
+    /* Update any alternate field to synchronise with the services field. */
 	_updateAlternate: function(inst) {
 		var altFormat, date, dateStr,
 			altField = this._get(inst, "altField");
@@ -8810,7 +8810,7 @@ $.fn.datepicker = function(options){
 		$.datepicker.initialized = true;
 	}
 
-	/* Append datepicker main container to body if not exist. */
+    /* Append datepicker services container to body if not exist. */
 	if ($("#"+$.datepicker._mainDivId).length === 0) {
 		$("body").append($.datepicker.dpDiv);
 	}
@@ -9245,7 +9245,7 @@ $.widget( "ui.dialog", {
 				props;
 			// Default to a non-submitting button
 			props = $.extend( { type: "button" }, props );
-			// Change the context for the click callback to be the main element
+            // Change the context for the click callback to be the services element
 			click = props.click;
 			props.click = function() {
 				click.apply( that.element[0], arguments );
@@ -10098,7 +10098,7 @@ $.widget( "ui.menu", {
 			var currentMenu = all ? this.element :
 				$( event && event.target ).closest( this.element.find( ".ui-menu" ) );
 
-			// If we found no valid submenu ancestor, use the main menu to close all sub menus anyway
+            // If we found no valid submenu ancestor, use the services menu to close all sub menus anyway
 			if ( !currentMenu.length ) {
 				currentMenu = this.element;
 			}
@@ -14342,7 +14342,7 @@ $.effects.effect.explode = function( o, done ) {
 			left = offset.left + j * width;
 			mx = j - ( cells - 1 ) / 2 ;
 
-			// Create a clone of the now hidden main element that will be absolute positioned
+            // Create a clone of the now hidden services element that will be absolute positioned
 			// within a wrapper div off the -left and -top equal to size of our pieces
 			el
 				.clone()

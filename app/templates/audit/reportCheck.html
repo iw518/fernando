@@ -80,7 +80,7 @@
         var stage;
         var editor = new wangEditor('editOpinions');
         // 仅仅想移除某几个菜单，例如想移除『插入代码』和『全屏』菜单：
-        // 其中的 wangEditor.config.menus 可获取默认情况下的菜单配置
+        // 其中的 wangEditor.xml.menus 可获取默认情况下的菜单配置
         editor.config.menus = $.map(wangEditor.config.menus, function (item, key) {
             if (item === 'insertcode' || item === 'fullscreen' || item === 'img' || item === 'video') {
                 return null;
@@ -114,11 +114,11 @@
         //一种是ajax-button-json方式，button提交的数据必须严格为json格式
         //ajax可以部分混用form中的控件，但必须严格提交json个数数据
         $('#save').click(function () {
-            var myUrl = "{{url_for('audit.reportCheck',projectNo=projectNo)}}";
+            var myUrl = "{{url_for('audit.report_check',projectNo=projectNo)}}";
             var myData = {"stage": stage, "content": editor.$txt.html()};
             var callback_function = function (data) {
                 return data["result"];
-            }
+            };
             if (editor.$txt.text() != '' && stage != '') {
                 $.ajax({
                     url: myUrl,
@@ -135,7 +135,7 @@
 
         function countChar(obj, target) {
             var counter = $(obj).text().length;
-            var result="您正处于编辑模式，当前意见字数总计："+counter+"字。"
+            var result = "您正处于编辑模式，当前意见字数总计：" + counter + "字。";
             $(target).text(result);
         }
     </script>

@@ -18,7 +18,7 @@
 		// For CommonJS and CommonJS-like environments where a proper window is present,
 		// execute the factory and get jQuery
 		// For environments that do not inherently posses a window with a document
-		// (such as Node.js), expose a jQuery-making factory as module.exports
+        // (such as Node.js), expose a jQuery-making factory as modules.exports
 		// This accentuates the need for the creation of a real window
 		// e.g. var jQuery = require("jquery")(window);
 		// See ticket #14549 for more info
@@ -241,7 +241,7 @@ jQuery.extend({
 	// Unique for each copy of jQuery on the page
 	expando: "jQuery" + ( version + Math.random() ).replace( /\D/g, "" ),
 
-	// Assume jQuery is ready without the ready module
+    // Assume jQuery is ready without the ready modules
 	isReady: true,
 
 	error: function( msg ) {
@@ -3578,7 +3578,7 @@ jQuery(function() {
 (function() {
 	var div = document.createElement( "div" );
 
-	// Execute the test only if not already executed in another module.
+    // Execute the test only if not already executed in another modules.
 	if (support.deleteExpando == null) {
 		// Support: IE<9
 		support.deleteExpando = true;
@@ -4193,7 +4193,7 @@ var rcheckableType = (/^(?:checkbox|radio)$/i);
 		div.cloneNode( true ).click();
 	}
 
-	// Execute the test only if not already executed in another module.
+    // Execute the test only if not already executed in another modules.
 	if (support.deleteExpando == null) {
 		// Support: IE<9
 		support.deleteExpando = true;
@@ -4280,7 +4280,7 @@ jQuery.event = {
 			handler.guid = jQuery.guid++;
 		}
 
-		// Init the element's event structure and main handler, if this is the first
+        // Init the element's event structure and services handler, if this is the first
 		if ( !(events = elemData.events) ) {
 			events = elemData.events = {};
 		}
@@ -8132,7 +8132,7 @@ if ( !getSetAttribute ) {
 			}
 		};
 
-	// Fixing value retrieval on a button requires this module
+    // Fixing value retrieval on a button requires this modules
 	jQuery.valHooks.button = {
 		get: function( elem, name ) {
 			var ret = elem.getAttributeNode( name );
@@ -10218,7 +10218,7 @@ jQuery.each( { scrollLeft: "pageXOffset", scrollTop: "pageYOffset" }, function( 
 // Add the top/left cssHooks using jQuery.fn.position
 // Webkit bug: https://bugs.webkit.org/show_bug.cgi?id=29084
 // getComputedStyle returns percent when specified for top/left/bottom/right
-// rather than make the css module depend on the offset module, we just audit for it here
+// rather than make the css modules depend on the offset modules, we just audit for it here
 jQuery.each( [ "top", "left" ], function( i, prop ) {
 	jQuery.cssHooks[ prop ] = addGetHookIf( support.pixelPosition,
 		function( elem, computed ) {
@@ -10285,14 +10285,12 @@ jQuery.fn.size = function() {
 jQuery.fn.andSelf = jQuery.fn.addBack;
 
 
-
-
-// Register as a named AMD module, since jQuery can be concatenated with other
+// Register as a named AMD modules, since jQuery can be concatenated with other
 // files that may use define, but not via a proper concatenation script that
 // understands anonymous AMD modules. A named AMD is safest and most robust
-// way to order. Lowercase jquery is used because AMD module names are
+// way to order. Lowercase jquery is used because AMD modules names are
 // derived from file names, and jQuery is normally delivered in a lowercase
-// file name. Do this after creating the global so that if an AMD module wants
+// file name. Do this after creating the global so that if an AMD modules wants
 // to call noConflict to hide this version of jQuery, it will work.
 if ( typeof define === "function" && define.amd ) {
 	define( "jquery", [], function() {

@@ -11,7 +11,6 @@
 # -------------------------------------------------------------------------------
 
 from app import db
-from app.models import Project
 
 HOLETYPE={
     'Bore_Hole':(1,'取土孔'),
@@ -29,6 +28,7 @@ HOLETYPE={
     'WaveVelocity_Hole':(13,'波速孔'),
     'HDP_Hole':(14,'重力触探')
 }
+
 
 class Hole(db.Model):
     __tablename__ = 'holes'

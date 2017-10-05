@@ -86,7 +86,7 @@
             var str1="<td colspan=2>层号</td>";
             {% for xLayer in layers %}
                 for(var i=0;i<selectrange.length;i++){
-                    if ({{loop.index}}==selectrange[i]){
+                    if ('{{loop.index}}' == selectrange[i]) {
                         str1=str1+"<td>{{xLayer.layerNo}}</td>";
                     }
                 }
@@ -102,7 +102,7 @@
 
                 {% for xLayer in layers %}
                     for(var j=0;j<selectrange.length;j++){
-                        if ({{loop.index}}==selectrange[j]){
+                        if ('{{loop.index}}' == selectrange[j]) {
                             {% for k in xLayer.__dict__.keys() %}
                                 if("{{k}}"==item[0]){str1=str1+"<td>{{xLayer.__dict__[k]}}</td>";}
                             {% endfor %}
@@ -143,8 +143,8 @@
                         $("#result_table>tbody:first>tr").eq(i).remove();
                     }
                 }
-            }    
-        }
+            }
+        };
         $("#calculate").bind('click',function(){filltable();});
     </script>
 {% endblock %}
