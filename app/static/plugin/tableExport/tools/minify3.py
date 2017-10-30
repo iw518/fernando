@@ -21,8 +21,11 @@ class bcolors:
         self.FAIL = ''
         self.ENDC = ''
 
-import http.client, urllib.request, urllib.parse, urllib.error, sys, os
 
+import http.client
+import urllib.error
+
+import os
 
 fmRootFolder = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + "/"
 

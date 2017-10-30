@@ -21,70 +21,72 @@ class bcolors:
         self.FAIL = ''
         self.ENDC = ''
 
-import httplib, urllib, sys, os
 
+import urllib
+
+import httplib
+import os
 
 fmRootFolder = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + "/"
 
-os.chdir(fmRootFolder + "scripts/") # set working directory
+os.chdir(fmRootFolder + "scripts/")  # set working directory
 
 toMinify = ["tableExport.js"]
 
-print bcolors.HEADER + "-------------------------------------" + bcolors.ENDC
+print(bcolors.HEADER + "-------------------------------------" + bcolors.ENDC)
 
 # we loop on JS languages files
 for index, item in enumerate(toMinify):
-  # print index, item
-  
-  dir = os.path.dirname(item)
-  file = os.path.basename(item)
-  
-  with open (fmRootFolder + item, "r") as myfile:
-          js_input=myfile.read()
+    # print index, item
 
-          # Define the parameters for the POST request and encode them in
-          # a URL-safe format.
+    dir = os.path.dirname(item)
+    file = os.path.basename(item)
 
-          params = urllib.urlencode([
-          ('js_code', js_input),
-          #   ('compilation_level', 'WHITESPACE_ONLY'),
-          ('compilation_level', 'SIMPLE_OPTIMIZATIONS'),
-          ('output_format', 'text'),
-          ('output_info', 'compiled_code'),
-          ])
+    with open(fmRootFolder + item, "r") as myfile:
+        js_input = myfile.read()
 
-          params2 = urllib.urlencode([
-          ('js_code', js_input),
-          #   ('compilation_level', 'WHITESPACE_ONLY'),
-          ('compilation_level', 'SIMPLE_OPTIMIZATIONS'),
-          ('output_format', 'text'),
-          ('output_info', 'errors'),
-          ])
+        # Define the parameters for the POST request and encode them in
+        # a URL-safe format.
 
-          # Always use the following value for the Content-type header.
-          headers = { "Content-type": "application/x-www-form-urlencoded" }
-          conn = httplib.HTTPConnection('closure-compiler.appspot.com')
-          conn.request('POST', '/compile', params, headers)
-          response = conn.getresponse()
-          data = response.read()
+        params = urllib.urlencode([
+            ('js_code', js_input),
+            #   ('compilation_level', 'WHITESPACE_ONLY'),
+            ('compilation_level', 'SIMPLE_OPTIMIZATIONS'),
+            ('output_format', 'text'),
+            ('output_info', 'compiled_code'),
+        ])
 
-          # we write the minified file - os.path.splitext(file)[0]  return filename without extension
-          with open(fmRootFolder + dir + '/' + os.path.splitext(file)[0] + ".min.js", "w") as text_file:
-                  text_file.write(data)
+        params2 = urllib.urlencode([
+            ('js_code', js_input),
+            #   ('compilation_level', 'WHITESPACE_ONLY'),
+            ('compilation_level', 'SIMPLE_OPTIMIZATIONS'),
+            ('output_format', 'text'),
+            ('output_info', 'errors'),
+        ])
 
-          # We retrieve errors
-          conn.request('POST', '/compile', params2, headers)
-          response = conn.getresponse()
-          errors = response.read()
+        # Always use the following value for the Content-type header.
+        headers = {"Content-type": "application/x-www-form-urlencoded"}
+        conn = httplib.HTTPConnection('closure-compiler.appspot.com')
+        conn.request('POST', '/compile', params, headers)
+        response = conn.getresponse()
+        data = response.read()
 
-          
-          if errors == "":
-                    print bcolors.OKBLUE + file + " has been minified. No error found."
-          else:
-                    print bcolors.FAIL + file + " : the code contains errors : "
-                    print ""
-                    print errors + bcolors.ENDC
+        # we write the minified file - os.path.splitext(file)[0]  return filename without extension
+        with open(fmRootFolder + dir + '/' + os.path.splitext(file)[0] + ".min.js", "w") as text_file:
+            text_file.write(data)
 
-          conn.close()
+        # We retrieve errors
+        conn.request('POST', '/compile', params2, headers)
+        response = conn.getresponse()
+        errors = response.read()
 
-print bcolors.HEADER + "-------------------------------------" + bcolors.ENDC
+        if errors == "":
+            print(bcolors.OKBLUE + file + " has been minified. No error found.")
+        else:
+            print(bcolors.FAIL + file + " : the code contains errors : ")
+            print("")
+            print(errors + bcolors.ENDC)
+
+        conn.close()
+
+print(bcolors.HEADER + "-------------------------------------" + bcolors.ENDC)

@@ -31,17 +31,22 @@ def workloads():
                 sumDep += hole.Dep
                 sumN += 1
         dict_workloads[key] = (DICT_HoleType[key][1], sumN, sumDep)
-    list1 = []
-    list2 = []
-    hole_list = find_holes_with_info(projectNo, 1)
-    for hole in hole_list:
-        list1.append(hole)
-    hole_list = find_holes_with_dep(projectNo)
-    for hole in hole_list:
-        list2.append(hole)
+
+    engHole_list = find_holes_with_info(projectNo, 1)
+    engHoleName_set = {hole.holeName for hole in engHole_list}
+    soilHole_list = find_holes_with_dep(projectNo)
+    soilHoleName_set = {hole.holeName for hole in soilHole_list}
+    allHoleName_set = soilHoleName_set | engHoleName_set
+    checkDep_list = []
+    for holeName in allHoleName_set:
+        engHole = extract_element(engHole_list, "holeName", holeName)
+        soilHole = extract_element(soilHole_list, "holeName", holeName)
+        engHole_dep = engHole.Dep if engHole  else 0
+        soilHole_dep = soilHole.Dep if soilHole  else 0
+        checkDep_list.append((holeName, engHole_dep, soilHole_dep))
 
     return render_template('stats/workloads.html', projectNo=projectNo, dict_workloads=dict_workloads,
-                           dict_soilloads=dict_soilloads, manager=FindManager(projectNo), list1=list1, list2=list2)
+                           dict_soilloads=dict_soilloads, manager=FindManager(projectNo), checkDep_list=checkDep_list)
 
 
 @stats.route('/excavation')

@@ -20,9 +20,7 @@
         </div>
         <div id="tab2" class="tab_content" style="display: block; ">
             <div class="row">
-                <div class="col-sm-12">
-                    <svg id='paper' style='width:1000px;height:800px;'></svg>
-                </div>
+                <div id="svgContainer" class="col-sm-12" align="center"></div>
             </div>
         </div>
     </div>
@@ -30,55 +28,207 @@
 
 {% block script %}
     {{ super() }}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/snap.svg-min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/jqTree/tree.jquery.js') }}"></script>
-    <script type="text/javascript"
-            src="{{ url_for('static', filename='js/custom/section/plotting-section.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/custom/section/data.js') }}"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/custom/section/texture.js') }}"></script>
     <script>
 
-        var data = [
-            {
-                name: '剖面列表',
-                children: [
-                    {% for section in sections %}
-                        {name: '{{ section.name }}'},
-                    {% endfor %}
-                ]
-            }
-        ];
+        /**
+         * Created by Administrator on 2017/3/3 0003.
+         */
 
-        $(function () {
-            var $tree = $('#tree');
-            $tree.tree({
-                data: data,
-                autoOpen: true,
-                closedIcon: $('<i class="fa fa-arrow-circle-right"></i>'),
-                openedIcon: $('<i class="fa fa-arrow-circle-down"></i>')
-            });
+        /**
+         A3 PAPER
+         */
+        $("#svgContainer").empty();
+        let scale = 100 * (96 / 2.54);
+        let scaleX = {{ paper.scale.x }};
+        let scaleY = {{ paper.scale.y }};
+        let offsetX = {{paper.offset.x}};
+        let offsetY = {{paper.offset.y}};
 
-            $tree.on(
-                'tree.click',
-                function (e) {
-                    var selected_node = e.node;
-                    {% for section in sections %}
-                        if (selected_node.name == "{{ section.name }}") {
-                            plotting_section({{ section.to_json()|safe }}, {{ layers|safe }});
-                            var expand_section = expand_section_info({{ section.to_json()|safe }});
-                            $("#section_expand").empty();
-                            for (var i = 0; i < expand_section.length; i++) {
-                                var expand_hole = "<div style='display:inline-block;vertical-align: top'>";
-                                for (var j = 0; j < expand_section[i].length; j++) {
-                                    expand_hole = expand_hole + "<div>" + expand_section[i][j] + "</div>";
-                                }
-                                expand_hole = expand_hole + "</div>";
-                                $("#section_expand").append(expand_hole)
-                            }
-                        }
-                    {% endfor %}
+        //生成svg root
+        let paper = d3.select("#svgContainer").append('svg');
+        paper.attr('id', 'section')
+            .attr('width', '100%')
+            .attr('height', '100%')
+            .attr('viewBox', '0 0 1600 1200')
+            .attr("overflow-x", "scroll")
+            .attr("overflow-y", "scroll")
+            .attr("preserveAspectRatio", "xMinYMin meet");
+
+
+        //画标题
+        let head_layer = paper.append('g');
+        head_layer.attr('id', 'head_layer').attr('text-anchor', 'middle');
+
+        let title = head_layer.append('text');
+        title.attr('x', '50%').attr('y', 25).attr('fontSize', 20);
+        title.text("工程地质剖面图");
+
+        let scale_str = head_layer.append('text');
+        scale_str.attr('x', '50%').attr('y', 75).attr('fontSize', 20);
+        scale_str.text("水平 1：" + scaleX + "    垂直1：" + scaleY);
+
+        let section_name = head_layer.append('text');
+        section_name.attr('x', '50%').attr('y', 125).attr('fontSize', 20);
+        section_name.text("{{ section.name }}--{{ section.name }}'");
+
+
+        paper.append('rect').attr('x', 0)
+            .attr('y', 0)
+            .attr('width', 1600)
+            .attr('height', 1200)
+            .attr('stroke', "#000")
+            .attr('stroke-width', 5)
+            .attr('fill', 'none');
+
+
+        //画比例尺
+        let scale_layer = paper.append('g');
+        scale_layer.attr('id', 'scale_layer');
+        plotting_scale(15, layer = scale_layer);
+
+        function plotting_scale(n, layer) {
+            for (var i = 1; i < n; i++) {
+                var rect = layer.append('rect')
+                    .attr('x', 10)
+                    .attr('y', (i - 1) * 40)
+                    .attr('width', 5)
+                    .attr('height', 4)
+                    .attr('stroke', "#000")
+                    .attr('stroke-width', 1);
+
+
+                if (i % 2 == 1) {
+                    layer.append('line').attr('x1', 10).attr('y1', (i - 1) * 40).attr('x2', 50).attr('y2', (i - 1) * 40).style({
+                        stroke: "#000",
+                        strokeWidth: 1
+                    });
+                    layer.append('line').attr('x1', 10).attr('y1', (i - 1) * 40).attr('x2', 50).attr('y2', (i - 1) * 40).style({
+                        "stroke": "#000",
+                        "stroke-width": 1
+                    });
+                    layer.append('text')
+                        .attr('x', 50)
+                        .attr('y', (i - 1) * 40)
+                        .attr('value', i);
                 }
-            );
-        });
+                else {
+                    rect.style({
+                        "stroke": "#222",
+                        "stroke-width": 1
+                    });
+                }
+            }
+
+        }
+
+        let x1, y1, x2, y2;
+
+        /*画勘探孔 */
+        let hole_layer = paper.append('g');
+        hole_layer.attr('id', 'hole_layer');
+        {% for hLine in hLines %}
+            x1 = offsetX + '{{ hLine[0].x }}' / scaleX;
+            y1 = offsetY - '{{ hLine[0].y }}' / scaleY;
+            x2 = offsetX + '{{ hLine[1].x }}' / scaleX;
+            y2 = offsetY - '{{ hLine[1].y }}' / scaleY;
+            hole_layer.append('line')
+                .attr('x1', parseInt(x1 * scale))
+                .attr('y1', parseInt(y1 * scale))
+                .attr('x2', parseInt(x2 * scale))
+                .attr('y2', parseInt(y2 * scale))
+                .attr('stroke', "#000")
+                .attr('stroke-width', 2);
+        {% endfor %}
+
+        /*画剖面线 */
+        let curve_layer = paper.append('g');
+        curve_layer.attr('id', 'curve_layer');
+        {% for curve in curves %}
+            {% for i in range(curve|length-1) %}
+                x1 = offsetX + {{ curve[i].x }}/scaleX;
+                y1 = offsetY - {{ curve[i].y }}/scaleY;
+                x2 = offsetX + {{ curve[i + 1].x }}/scaleX;
+                y2 = offsetY - {{ curve[i + 1].y }}/scaleY;
+                curve_layer.append('line')
+                    .attr('x1', parseInt(x1 * scale))
+                    .attr('y1', parseInt(y1 * scale))
+                    .attr('x2', parseInt(x2 * scale))
+                    .attr('y2', parseInt(y2 * scale))
+                    .attr('stroke', "#000")
+                    .attr('stroke-width', 1);
+
+            {% endfor %}
+        {% endfor %}
+
+
+
+        /*填充剖面 */
+        let fill_layer = paper.append('g');
+        fill_layer.attr('id', 'fill_layer');
+
+        console.log(view_scale());
+        /*粉质粘土 */
+        var t0 =
+            textures.paths()
+                .d("siltclay").size(16 * view_scale())
+                .lighter();
+        /*粘土 */
+        var t1 =
+            textures.paths()
+                .d("clay").size(15 * view_scale())
+                .lighter().stroke("darkorange");
+
+        var t2 = textures.lines()
+            .lighter();
+        paper.call(t0);
+        paper.call(t1);
+
+        var polygon_points = '';
+        {% for i in range(curves|length-1) %}
+            {% for point in curves[i] %}
+                x1 = (offsetX + {{ point.x }} /scaleX)* scale;
+                y1 = (offsetY - {{ point.y }} /scaleY)* scale;
+                polygon_points = polygon_points + ' ' + parseInt(x1) + ',' + parseInt(y1);
+            {% endfor %}
+            {% for j in range(curves[i+1]|length) %}
+                {% set point=curves[i+1][curves[i+1]|length-1-j] %}
+                x1 = (offsetX + {{ point.x }} /scaleX)* scale;
+                y1 = (offsetY - {{ point.y }} /scaleY)* scale;
+                polygon_points = polygon_points + ' ' + parseInt(x1) + ',' + parseInt(y1);
+            {% endfor %}
+            {% if i%2==1 %}
+                fill_layer.append('polygon').attr('points', polygon_points).style(
+                    "fill", t0.url());
+
+            {% else %}
+                fill_layer.append('polygon').attr('points', polygon_points).style(
+                    "fill", t1.url());
+            {% endif %}
+            polygon_points = '';
+        {% endfor %}
+
+        function view_scale() {
+            //计算宽度
+            min_scale = Math.min(1600 / $('#section').width(), 1200 / $('#section').height());
+            return parseInt(min_scale * 10) / 10;
+        }
+
+        function view_scale0() {
+            //计算宽度
+            var obj = document.getElementById("section");
+            var style = null;
+            if (window.getComputedStyle) {
+                style = window.getComputedStyle(obj, null);    // 非IE
+            } else {
+                style = obj.currentStyle;  // IE
+            }
+            min_scale = Math.min(1600 / style.width.slice(0, -2), 1200 / style.height.slice(0, -2));
+            return parseInt(min_scale * 10) / 10;
+        }
 
     </script>
 {% endblock %}

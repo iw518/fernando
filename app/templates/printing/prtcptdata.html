@@ -220,7 +220,7 @@
     <!-- -读取勘探孔列表中选择的孔号及其日期-->
     <script>
         $('#print_cpt').click(function () {
-            L = $('#tbl_holes').find('tbody input[title=选择]:checked').length;
+            var L = $('#tbl_holes').find('tbody input[title=选择]:checked').length;
             if (L === 0) {
                 console.log("没有选择任何勘探孔！");
             }
@@ -240,7 +240,7 @@
                     type: 'POST',
 
                     success: function (data) {
-                        if (data = 'successful') {
+                        if (data === 'successful') {
                             window.location.href = "{{ url_for('printing.export') }}"
                         }
                         {#
@@ -305,8 +305,8 @@
     <!--日期增长函数-->
     <script>
         function dateIncrease(date, num) {
-            var date = date.replace('.', '-').replace('/', '-');
-            var aDate = date.split('-');
+            var newdate = date.replace('.', '-').replace('/', '-');
+            var aDate = newdate.split('-');
             var year = parseInt(aDate[0]);
             var month = parseInt(aDate[1]);
             var day = parseInt(aDate[2]) + num;

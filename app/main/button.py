@@ -7,9 +7,8 @@ from wtforms.widgets import HTMLString, html_params
 
 
 class ButtonWidget(object):
-    '''
-    用于显示按钮(button)的部件(widget)
-    '''
+    """ 用于显示按钮(button)的部件(widget) """
+
     def __call__(self, field, **kwargs):
         kwargs.setdefault('name', field.name)
         kwargs.setdefault('value', field.value)
@@ -17,13 +16,12 @@ class ButtonWidget(object):
         return HTMLString('<button %s>%s</button>' % (
             html_params(**kwargs),
             escape(field._value())
-            ))
+        ))
 
 
 class ButtonField(Field):
-    '''
-    定义可以将按钮(button)用于 Flask 表单(form)的域(field)
-    '''
+    """定义可以将按钮(button)用于 Flask 表单(form)的域(field)"""
+
     widget = ButtonWidget()
 
     def __init__(self, text, name='submit', **kwargs):

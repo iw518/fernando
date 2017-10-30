@@ -11,7 +11,6 @@
 # -------------------------------------------------------------------------------
 
 import sys
-import xml.dom.minidom as xmlDom
 
 import copy
 import struct
@@ -20,6 +19,7 @@ from .base.hole import *
 from .base.layer import *
 from .base.point import *
 from .base.section import *
+from .base.utility import read_xml
 from .dataset import *
 
 # SILTYS=['砂质粉土','粉砂','细砂','粉细砂','中砂','粗砂','中粗砂','砾砂']
@@ -35,8 +35,8 @@ dirs = ["勘探数据/单孔数据/",
 
 #  若用os.path.dirname(x)来查找上级目录，并创建父目录，有时候查找不到，具体原因不明
 #  os.mkdir(x)用来创建一层目录，os.makedirs(x)用来创建多层目录
-for dir in dirs:
-    path = os.path.join(ROOTDIR, 'tmp', dir)
+for dirname in dirs:
+    path = os.path.join(ROOTDIR, 'tmp', dirname)
     if not os.path.exists(path):
         os.makedirs(path)
     if path not in paths:
@@ -49,12 +49,21 @@ def find_sections(projectNo):
     holes = find_holes_with_layer(projectNo)
     sections = []
     section = Section()
+    accumulate_distance = 0
+    last_distance = 0
     for name, holeName, distance in res:
-        if not (section.name == name):
+        if section.name != name:
             section = Section(name)
             sections.append(section)
-        hole = extract_element(holes, "holeName", holeName)
-        section.items.append((hole, distance))
+            hole = extract_element(holes, "holeName", holeName)
+            section.items.append((hole, 0))
+            accumulate_distance = 0
+            last_distance = distance
+        else:
+            hole = extract_element(holes, "holeName", holeName)
+            accumulate_distance = accumulate_distance + last_distance
+            section.items.append((hole, accumulate_distance))
+            last_distance = distance
     return sections
 
 
@@ -78,7 +87,7 @@ def find_holes_with_BG(projectNo):
 
         # 部分土样可能没有颗粒分析数据
         k025_0074 = k025_0074 if k025_0074 else 0
-        k_0005 = k_0005 if k_0005  else 0
+        k_0005 = k_0005 if k_0005 else 0
 
         if k025_0074 > 50:
             soilType = '粉砂'
@@ -139,13 +148,13 @@ def res_lique(projectNo):
                     if xPoint.clayContent is None:
                         result = (hole.holeName,
                                   xLayer.layerNo,
-                                  '%.2f' % (xPoint.testDep),
+                                  '%.2f' % xPoint.testDep,
                                   xPoint.N,
                                   '',
                                   '否',
                                   '-',
                                   '-',
-                                  '%.2f' % (xPoint.Di),
+                                  '%.2f' % xPoint.Di,
                                   '',
                                   '',
                                   xPoint.inf)
@@ -153,15 +162,15 @@ def res_lique(projectNo):
                     else:
                         result = (hole.holeName,
                                   xLayer.layerNo,
-                                  '%.2f' % (xPoint.testDep),
-                                  '%.2f' % (xPoint.clayContent),
+                                  '%.2f' % xPoint.testDep,
+                                  '%.2f' % xPoint.clayContent,
                                   xPoint.N,
                                   FilterZero(xPoint.Ncr, True),
                                   # ('%.2f' % (xPoint.Ncr) if type(xPoint.Ncr) is float else xPoint.Ncr),
                                   xPoint.lique_flag,
                                   xPoint.FLei,
-                                  '%.2f' % (xPoint.Di),
-                                  '%.2f' % (xPoint.Wi),
+                                  '%.2f' % xPoint.Di,
+                                  '%.2f' % xPoint.Wi,
                                   xPoint.ILei,
                                   xPoint.inf)
                         liqueList.append(result)
@@ -343,7 +352,6 @@ def ExportLayers_Stat(projectNo, mode=1):
             myrange = range(1, len(keytuple))
         for i in myrange:
             key = keytuple[i][0]
-            value = 0
             if key == "DENSITY":
                 value = round(item[2 + i] * 9.8, keytuple[i][5])
             elif key == "KH" or key == "KV":
@@ -359,9 +367,9 @@ def FindSiltLayers(projectNo):
     siltLayers = []
     layers = find_layers(projectNo)
     for xLayer in layers:
-        if (xLayer.layerAge is None):
+        if xLayer.layerAge is None:
             print('地质时代未输入，请补齐')
-        elif (xLayer.layerAge.startswith('Q4') and ('砂' in xLayer.layerName.split('夹')[0])):
+        elif xLayer.layerAge.startswith('Q4') and ('砂' in xLayer.layerName.split('夹')[0]):
             siltLayers.append(xLayer)
             # print('本工程的砂土层或砂质粉土层为：%s\t%s\t'%(xLayer.layerNo,xLayer.layerName))
     return siltLayers
@@ -387,7 +395,7 @@ def find_CPT(projectNo, genfile=False):
         hole = CPTHole()
         try:
             hole.holeName = item[0].encode('latin-1').decode('gbk')
-        except  UnicodeEncodeError:
+        except UnicodeEncodeError:
             hole.holeName = item[0]
         hole.projectNo = projectNo
         buff = item[1]
@@ -445,7 +453,7 @@ def lab_workloads(projectNo):
 
 
 def GroupTotal(total, factor=8):
-    '''
+    """
     转置分列
     默认每张水位表最大可容纳8列'
       1,2,3,.......................1factor
@@ -453,7 +461,7 @@ def GroupTotal(total, factor=8):
       ....................................
       ....................................
       (rank-1)factor+1,..........rank*factor
-    '''
+    """
 
     rank = math.floor(total / factor)
     remainder = total % factor
@@ -462,26 +470,12 @@ def GroupTotal(total, factor=8):
     else:
         rank = rank + 1
         factor = math.ceil(total / rank)
-    return (factor, rank)
+    return factor, rank
 
 
-def readXML(filename):
-    basedir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-    filename = filename + ".xml"
-    filename = os.path.join(basedir, 'xml', filename)
-    dom = xmlDom.parse(filename)
-    root = dom.documentElement
-    nodes = root.childNodes
-    return nodes
-
-
-def import_XML():
+def import_xml():
     configDict = {}
-    basedir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-    filename = os.path.join(basedir, 'xml', 'template.xml')
-    dom = xmlDom.parse(filename)
-    root = dom.documentElement
-    nodes = root.childNodes
+    nodes = read_xml('template')
     for node in nodes:
         # 默认xml中换行符及空格也属于节点,即COMMENT_NODE
         # 此外还有ATTRIBUTE_NODE以及ELEMENT_NODE
@@ -499,9 +493,7 @@ def import_XML():
 
 
 def import_motto(filename):
-    dom = xmlDom.parse(filename)
-    root = dom.documentElement
-    nodes = root.childNodes
+    nodes = read_xml(filename)
     mottos = []
     for node in nodes:
         # 默认xml中换行符及空格也属于节点,即COMMENT_NODE

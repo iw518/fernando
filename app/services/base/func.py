@@ -10,6 +10,14 @@
 # Licence:     <GPLV3>
 # -------------------------------------------------------------------------------
 
+
+class AcPoint:
+    def __init__(self, x=0.0, y=0.0, z=0.0):
+        self.x = x
+        self.y = y
+        self.z = z
+
+
 class SuperList(list):
     def __init__(self, obj):
         super(SuperList, self).__init__()
@@ -25,48 +33,11 @@ class SuperList(list):
                 return item
 
 
-class SuperList2():
-    __items = []
-
-    @property
-    def items(self):
-        return self.__items
-
-    def append(self, x):
-        return self.__items.append(x)
-
-    def extend(self, x):
-        return self.__items.extend(x)
-
-    def remove(self, x):
-        return self.__items.remove(x)
-
-    def index(self, x):
-        return self.__items.index(x)
-
-    def pop(self, i):
-        return self.__items.pop(i)
-
-    @staticmethod
-    def clear(self):
-        return []
-
-    def insert(self, i, x):
-        return self.__items.insert(i, x)
-
-    def count(self, x):
-        return self.__items.count(x)
-
-    def filter(self, my_attr, my_attr_value):
-        for x in self.__items:
-            if getattr(x, my_attr) == my_attr_value:
-                return x
-
-
-def extract_element(obj, my_attr, my_attr_value):
-    for item in obj:
-        if getattr(item, my_attr) == my_attr_value:
-            return item
+def extract_element(objs, my_attr, my_attr_value):
+    for obj in objs:
+        if getattr(obj, my_attr) == my_attr_value:
+            return obj
+    return None
 
 
 def AddDate(xDate, num=1):
@@ -97,21 +68,21 @@ def AddDate(xDate, num=1):
 
 
 def convert2dict(objs):
-    '''把对象列表转换为字典列表'''
+    # 把对象列表转换为字典列表
 
     obj_arr = []
     for o in objs:
-        dict = {}
+        mydict = {}
         '''
         for item in dir(o):
             dict[item] = o.item  #错误o没有‘item’
             dict.update(o.__dict__)
         '''
         for item in dir(o):
-            dict[item] = getattr(o, item, 0)
+            mydict[item] = getattr(o, item, 0)
         # print(dir(o))
-        print(dict)
-        obj_arr.append(dict)
+        print(mydict)
+        obj_arr.append(mydict)
     return obj_arr
 
 

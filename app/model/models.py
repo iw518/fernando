@@ -209,7 +209,6 @@ class Registration(db.Model):
     #     db.session.add(registration)
     #     db.session.commit()
 
-
     def findUser(self):
         team = Team.query.filter_by(id=self.team_id).first()
         user = User.query.filter_by(id=team.user_id).first()

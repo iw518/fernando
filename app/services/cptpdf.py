@@ -39,7 +39,7 @@ def export2pdf(holes, probe, projectNo):
     pages = []
     for hole in holes.values():
         # Attenion:where elments.extend must be used,but not elements.append
-        page = Cpt2Pdf(hole, probe, projectNo)
+        page = gen_page(hole, probe, projectNo)
         pages.extend(page)
     import datetime
     now = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -52,7 +52,7 @@ def export2pdf(holes, probe, projectNo):
     return doc.filename
 
 
-def Cpt2Pdf(hole, probe, projectNo):
+def gen_page(hole, probe, projectNo):
     holeName = hole['holeName']
     date = hole['date']
     data = hole['data']
@@ -73,18 +73,18 @@ def Cpt2Pdf(hole, probe, projectNo):
                     test_dep = Aijk / 10
                     # 如果txt格式，获得的可能是字符串格式，此处要用float转换
                     test_val = float(data[Aijk])
-                    cells.append('%.1f' % (test_dep))
-                    cells.append('%.2f' % (test_val))
+                    cells.append('%.1f' % test_dep)
+                    cells.append('%.2f' % test_val)
             rows.append(cells)
         # Send the data and build the file
-        page = genpage(holeName, dep, date, probe, rows, projectNo)
+        page = gen_template(holeName, dep, date, probe, rows, projectNo)
         pages.append(page)
         pages.append(PageBreak())
     return pages
 
 
 # 静力触探记录表表格样式，其中的data(静力触探数据)通过函数CPT2PDF(xHole,probeInf)出入
-def genpage(holeName, dep, date, probe, rows, projectNo='某工程'):
+def gen_template(holeName, dep, date, probe, rows, projectNo='某工程'):
     pagedata = [['单桥静力触探记录表', '', '', '', '', '', '', '', '', '']]
     pagedata.append(['工程编号', projectNo,
                      '孔          号', holeName,
@@ -153,7 +153,7 @@ def genpage(holeName, dep, date, probe, rows, projectNo='某工程'):
                         ('LINEAFTER', (3, 4), (3, -2), 1, colors.black),
                         ('LINEAFTER', (5, 4), (5, -2), 1, colors.black),
                         ('LINEAFTER', (7, 4), (7, -2), 1, colors.black),
-                        ('BOX', (0, 4), (-1, -2), 1.5, colors.black),  # 外边框
+                        ('BOX', (0, 4), (-1, -2), 1.5, colors.black)
                         ])
     # Configure style and word wrap
     # t=Table(data,10*[1.75*cm],54*[0.5*cm])

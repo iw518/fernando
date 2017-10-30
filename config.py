@@ -12,7 +12,8 @@
 import os
 
 ROOTDIR = os.path.abspath(os.path.dirname(__file__))
-CONFDIR = os.path.abspath(os.path.join(ROOTDIR, 'app', 'xml'))
+XMLDIR = os.path.abspath(os.path.join(ROOTDIR, 'app', 'xml'))
+
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
@@ -66,5 +67,5 @@ def cleandir(path):
         for filename in files:
             file = os.path.join(root, filename)
             os.remove(file)
-        for dir in dirs:
-            cleandir(os.path.join(root, dir))
+        for dirname in dirs:
+            cleandir(os.path.join(root, dirname))

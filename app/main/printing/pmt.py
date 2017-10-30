@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------
 from flask import render_template, request
 
-from app.services.core import *
+from app.services.core import find_sections
 from . import printing
 
 
@@ -21,5 +21,8 @@ def pmt():
     if request.method == 'POST':
         return None
     sections = find_sections(projectNo)
-    layers = [item.to_json() for item in find_layers(projectNo)]
-    return render_template('pmt.html', projectNo=projectNo, sections=sections, layers=layers)
+    section = sections[0]
+
+    curves = section.draw_sectionLine()
+    return render_template('printing/pmt.html', projectNo=projectNo, section=section, curves=curves,
+                           hLines=section.hLines, paper=section.paper)

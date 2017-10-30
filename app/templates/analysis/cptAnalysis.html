@@ -55,7 +55,7 @@
                 var mydata={};  
                 var callback_function=function(dict){$("#gen_txt").attr("href",dict['result']);
                                                      $("#gen_txt").get(0).click();
-                                                    }
+                };
                 $.ajax({
                     url:myurl,
                     data:mydata,

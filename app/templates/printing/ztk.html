@@ -91,18 +91,16 @@
                     obj.options.add(hole_option);
                 {% endfor %}
             }
-            cptCurve = document.getElementById("cptCurve");
             var holeName = $("#cptSelection").find("option:selected").text();
             $("#ps_curve>table:first>tbody:first>tr:gt(0)").remove();
 
             var ps_circle = document.getElementById("ps_circle");
             var svgDoc = ps_circle.ownerDocument;
             var rings = ps_circle.getElementsByTagName("rect");
-            for (i = rings.length - 1; i >= 0; i--) {
+            for (var i = rings.length - 1; i >= 0; i--) {
                 ps_circle.removeChild(rings[i]);
             }
             var rect;
-            var myurl;
 
             {% for hole in hole_list %}
                 if ("{{hole.holeName}}" == holeName) {
@@ -126,14 +124,10 @@
                             rect.setAttribute("width", "100%");
                             rect.setAttribute("height", depth2px(layerThickness));
                             var myurl;
-                            if ({{loop.index}}%
-                            2 == 0;
-                        )
-                            {
+                            if (parseInt("{{loop.index}}") % 2 === 0) {
                                 myurl = "url(#" + "clay_tile" + ")";
                             }
-                        else
-                            {
+                            else {
                                 myurl = "url(#" + "siltclay_tile" + ")";
                             }
                             rect.style.setProperty("fill", myurl);

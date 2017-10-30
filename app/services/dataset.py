@@ -76,7 +76,7 @@ def before_req(f):
 
 
 # 注意session也可在非视图函数中用，最终传入视图函数，不像request.cookies.get及make_response.set_cookie那般不好用
-@before_req
+# @before_req
 def read_sql(func_name, *args):
     basedir = os.path.abspath(os.path.dirname(__file__))
     file = os.path.join(basedir, 'core.sql')

@@ -5,11 +5,20 @@
 # author:       fernando
 # license:      MIT License
 # contact:      iw518@163.com
-# purpose:      __init__
-# date:         2017-08-12
+# purpose:      utility
+# date:         2017-10-05
 # copyright:    copyright  2017 Xu, Aiwu
 # -------------------------------------------------------------------------------
-from flask import Blueprint
+import xml
 
-printing = Blueprint('printing', __name__)
-from . import prtcptdata, ztk, pmt
+import os
+
+from config import XMLDIR
+
+
+def read_xml(filename, dirname=XMLDIR):
+    file = os.path.join(dirname, filename + '.xml')
+    dom = xml.dom.minidom.parse(file)
+    root = dom.documentElement
+    nodes = root.childNodes
+    return nodes

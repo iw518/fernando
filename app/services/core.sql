@@ -60,7 +60,7 @@ FROM (zp93
   INNER JOIN base
     ON zp93.project_count = base.project_count)
   INNER JOIN pholeatt ON zp93.hnumber = pholeatt.hnumber
-WHERE base.project_name = '{0}' AND pholeatt.attribute > {1} AND pholeatt.attribute <{2}
+WHERE base.project_name = '{0}' AND pholeatt.attribute > '{1}' AND pholeatt.attribute < '{2}'
 ORDER BY pholeatt.attribute, zp93.norder, LEN(pholeatt.holeno),
 pholeatt.holeno
 --end find_holes_with_layer

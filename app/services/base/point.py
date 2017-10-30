@@ -12,7 +12,7 @@
 import math
 
 
-class AbstractPoint():
+class AbstractPoint:
     def __init__(self):
         self.pointID = 0
         self.testDep = 0.0
@@ -35,7 +35,7 @@ class PsPoint(AbstractPoint):
 
 
 class NPoint(AbstractPoint):
-    '注意类变量和对象变量的区别'
+    # 注意类变量和对象变量的区别
 
     def __init__(self):
         super(NPoint, self).__init__()

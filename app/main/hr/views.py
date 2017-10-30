@@ -17,10 +17,10 @@ from . import hr
 from .forms import RegisterForm
 
 
-@hr.route('/team_manage',methods=['POST','GET'])
+@hr.route('/team_manage', methods=['POST', 'GET'])
 def team_manage():
     form = RegisterForm()
     if form.validate_on_submit():
-        Team(job_id=form.job_selections.data,user_id=form.user_selections.data)
+        Team(job_id=form.job_selections.data, user_id=form.user_selections.data)
         return redirect(url_for('order.employee'))
     return render_template('hr/team_manage.html', form=form)

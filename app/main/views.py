@@ -54,5 +54,5 @@ def index3():
     else:
         print("NO COOKIES!")
         edition = 'Enterprise'
-        resp = make_response('SET COOKIES')
+        resp = make_response('SET COOKIES' + edition)
         return resp

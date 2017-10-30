@@ -36,8 +36,8 @@ def cptAnalysis():
                 else:
                     xLayer = hole.layers[i]
                     for testPoint in hole.points:
-                        if testPoint.testDep > round(xLayer.startDep, 2) and testPoint.testDep <= round(xLayer.endDep,
-                                                                                                        2):  # 注意小数位数不等也可能导致不相等，情况允许时，应该调整layer函数的位数
+                        # 注意小数位数不等也可能导致不相等，情况允许时，应该调整layer函数的位数
+                        if round(xLayer.startDep, 2) < testPoint.testDep <= round(xLayer.endDep, 2):
                             SumPs = SumPs + testPoint.testValue
                     if xLayer.endDep - xLayer.startDep == 0:
                         hole_ps_list.append([hole.holeName, 0])
@@ -54,9 +54,9 @@ def cptAnalysis():
                                )
 
     if request.method == 'POST':
-        str0 = "%s\t" % ('')
+        str0 = "%s\t" % ''
         for hole in hole_list:
-            str0 = str0 + "%s\t" % (hole.holeName)
+            str0 = str0 + "%s\t" % hole.holeName
         str0 = str0 + "\n"
         for i in range(0, len(find_layers(projectNo))):
             str0 = str0 + find_layers(projectNo)[i].layerNo + "\t"
@@ -65,16 +65,15 @@ def cptAnalysis():
                 SumPs = 0
                 # print("%s\t"%(xHole.holeName))
                 if i >= len(hole.layers):
-                    str0 = str0 + "%s\t" % ('')
+                    str0 = str0 + "%s\t" % ''
                 else:
                     xLayer = hole.layers[i]
                     for testPoint in hole.points:
                         # 注意小数位数不等也可能导致不相等，情况允许时，应该调整layer函数的位数
-                        if (testPoint.testDep > round(xLayer.startDep, 2) and
-                                    testPoint.testDep <= round(xLayer.endDep, 2)):
+                        if round(xLayer.startDep, 2) < testPoint.testDep <= round(xLayer.endDep, 2):
                             SumPs = SumPs + testPoint.testValue
                     if xLayer.endDep - xLayer.startDep == 0:
-                        str0 = str0 + "%s\t" % ('')
+                        str0 = str0 + "%s\t" % ''
                     else:
                         str0 = str0 + "%.2f\t" % (SumPs / (xLayer.endDep - xLayer.startDep) / 10)
             str0 = str0 + "\n"
@@ -86,7 +85,7 @@ def cptAnalysis():
             "1.txt"
         )
         f = open(filename, 'w', encoding="UTF-8")
-        print(str0, file=f)
+        print(str0, f)
         f.close()
         myurl = url_for(
             "static",
@@ -143,6 +142,7 @@ def layerAnalysis():
         for xLayer in find_layers(projectNo):
             layerNo = xLayer.layerNo
             list1 = []
+            global layer_hole_elevation_list
             for hole in hole_list:
                 if hole.layers.find(layerNo):
                     if layerNo != hole.layers[-1].layerNo:

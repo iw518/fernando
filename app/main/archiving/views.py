@@ -16,7 +16,7 @@ import collections
 from flask import render_template, request, jsonify
 
 from app.model.models import Project
-from app.services.core import readXML
+from app.services.base.utility import read_xml
 from . import archiving
 
 
@@ -34,11 +34,11 @@ def record():
         return jsonify(
             {"project_fullname": project.fullname, "project_assistant_fullname": project.find_user().fullname})
     elif request.form["type"] == "submit":
-        archiving = int(request.form['archiving'])
+        archiving_amount = int(request.form['archiving'])
         archiving_date = datetime.datetime.strptime(request.form['archiving_date'], '%Y-%m-%d')
         print(archiving_date)
-        if archiving > 0 and archiving_date != '':
-            project.profile.archiving = archiving
+        if archiving_amount > 0 and archiving_date != '':
+            project.profile.archiving = archiving_amount
             project.profile.archiving_date = archiving_date
             return jsonify(result='successful!')
         else:
@@ -46,7 +46,7 @@ def record():
 
 
 def importCatalog(filename):
-    nodes = readXML(filename)
+    nodes = read_xml(filename)
     catalog = collections.OrderedDict()
     for node in nodes:
         if node.nodeType == 1:

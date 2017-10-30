@@ -89,7 +89,7 @@ class EmployeeForm(Form):
 
 
 class BuildInfForm(Form):
-    project_fullname=StringField('项目名称：')
+    project_fullname = StringField('项目名称：')
     phase = SelectField('勘察阶段', coerce=int, choices=[(1, '初步勘察'), (2, '详细勘察'), (3, '补充勘察'), (4, '施工勘察'), (5, '其他')])
     client = StringField('建设单位')
     design = StringField('设计单位')

@@ -66,7 +66,6 @@ def create_app(config_name):
     app.register_blueprint(stats_blueprint, url_prefix="/stats")
     app.register_blueprint(trans_blueprint, url_prefix="/trans")
 
-
     with app.app_context():
         # Extensions like Flask-SQLAlchemy now know what the "current" app
         # is while within this block. Therefore, you can now run........

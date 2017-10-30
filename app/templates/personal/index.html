@@ -105,11 +105,11 @@
                         var tr = $.map(tdlist, function (value) {
                             return "<td>" + value + "</td>";
                         }).join();
-                        var tr = "<tr class='parent_row'>" + tr + "</tr>";
+                        tr = "<tr class='parent_row'>" + tr + "</tr>";
                         $('#tbl_main:first tbody:first').append(tr);
                         $('#tbl_main:first tbody:first tr:last').attr('id', "row_" + row_num);
                         if (project.fee_income_sum_real > 0) {
-                            mylist = project.fee_income_real_list;
+                            var mylist = project.fee_income_real_list;
                             for (var j = 0; j < mylist.length; j++) {
                                 $('#tbl_main:first tbody:first').append("<tr><td colspan='7'></td><td>" + mylist[j][0] + "</td><td colspan='2'>" + mylist[j][1] + "</td></tr>");
                                 $('#tbl_main:first tbody:first tr:last').addClass("child_row_" + row_num);
@@ -136,7 +136,7 @@
                     type: "POST",
                     dataType: "text",
                     success: callback_function,
-                    error: function (xhr) {
+                    error: function () {
                         alert("error");
                     }
                 });

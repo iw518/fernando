@@ -12,7 +12,7 @@
 import os
 from flask import request, render_template, jsonify, session
 
-from app.services.core import import_XML
+from app.services.core import import_xml
 from app.services.dataset import MSSQL
 from config import ROOTDIR
 from . import setting
@@ -20,7 +20,7 @@ from . import setting
 
 @setting.route("/layer_template", methods=['POST', 'GET'])
 def layer_template():
-    layerConfigDict = import_XML()
+    layerConfigDict = import_xml()
     if request.method == 'POST':
         return jsonify(result=layerConfigDict)
     else:

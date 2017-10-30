@@ -45,7 +45,7 @@ DICT_SoilTestType = {
 
 class Hole:
     def __init__(self, holeType=-1):
-        '注意类变量和对象变量的区别'
+        # 注意类变量和对象变量的区别'
         self.holeName = ''
         self.holeID = 0
         self.holeType = holeType
@@ -56,7 +56,7 @@ class Hole:
         self.testPoints = []
         self.projectNo = ''
         self.testDate = 0
-        self._points = Points()
+        self.__points = Points()
 
     @property
     def Dep(self):
@@ -68,7 +68,7 @@ class Hole:
 
     @property
     def points(self):
-        return self._points
+        return self.__points
 
     @points.setter
     def points(self, value):
@@ -79,17 +79,18 @@ class Hole:
         if float(self.elevation) and float(self.waterLevel):
             return round(self.elevation - self.waterLevel, 2)
 
+
     def to_json(self):
-        dict = {}
+        mydict = {}
         for key, value in self.__dict__.items():
             if isinstance(value, str) or isinstance(value, int) or isinstance(value, float):
-                dict[key] = value
+                mydict[key] = value
             elif isinstance(value, Layers):
-                list = []
+                mylist = []
                 for layer in value:
-                    list.append(layer.to_json())
-                dict[key] = list
-        return dict
+                    mylist.append(layer.to_json())
+                mydict[key] = mylist
+        return mydict
 
 
 class BoreHole(Hole):
@@ -103,7 +104,7 @@ class CPTHole(Hole):
 
     @property
     def pss(self):
-        return ','.join('%.2f' % (xPoint.testValue) for xPoint in self.points)
+        return ','.join('%.2f' % xPoint.testValue for xPoint in self.points)
 
     @property
     def Dep(self):

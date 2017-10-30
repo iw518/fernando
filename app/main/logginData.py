@@ -21,7 +21,7 @@ logginData = Blueprint('logginData', __name__)
 @logginData.route("/layersInf", methods=["GET", "POST"])
 def layersInf():
     projectNo = request.args.get('projectNo')
-    layerConfigDict = import_XML()
+    layerConfigDict = import_xml()
     if request.method == "POST":
         templateName = request.form["templateName"]
         print("bug" + templateName)

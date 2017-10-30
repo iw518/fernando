@@ -91,14 +91,14 @@
             var awesomplete = new Awesomplete(obj, {
                 minChars: 0,
                 maxItems: 100,
-                sort:function(){return;},
+                sort: function () {
+                },
             });
             var myurl="{{url_for('logginData.layersInf',projectNo=projectNo)}}";
 
             var callback_function=function (data) {
-                var list=data["result"];
-                awesomplete.list = list;
-            }
+                awesomplete.list = data["result"];
+            };
 
             $(obj).bind('keyup', function () {
                 $.ajax({
