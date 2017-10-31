@@ -40,6 +40,13 @@ def extract_element(objs, my_attr, my_attr_value):
     return None
 
 
+def iszero(num):
+    import sys
+    if (num - sys.float_info.epsilon) * (num + sys.float_info.epsilon) <= 0:
+        return True
+    return False
+
+
 def AddDate(xDate, num=1):
     newDate = xDate.replace('.', '-').replace('/', '-')
     xlist = newDate.split('-')

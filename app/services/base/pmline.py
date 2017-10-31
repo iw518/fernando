@@ -25,7 +25,6 @@ class Pmline:
                 if self.points[n].x <= x <= self.points[n + 1].x:
                     k = (self.points[n + 1].y - self.points[n].y) / (self.points[n + 1].x - self.points[n].x)
                     return (x - self.points[n].x) * k + self.points[n].y
-
         return func
 
     @property

@@ -64,16 +64,18 @@
         head_layer.attr('id', 'head_layer').attr('text-anchor', 'middle');
 
         let title = head_layer.append('text');
-        title.attr('x', '50%').attr('y', 25).attr('fontSize', 20);
+        title.attr('x', '50%').attr('y', 25).attr('font-size', 20);
         title.text("工程地质剖面图");
 
+        let section_name = head_layer.append('text');
+        section_name.attr('x', '50%').attr('y', 50).attr('font-size', 20);
+        section_name.text("{{ section.name }}--{{ section.name }}'");
+
         let scale_str = head_layer.append('text');
-        scale_str.attr('x', '50%').attr('y', 75).attr('fontSize', 20);
+        scale_str.attr('x', '50%').attr('y', 75).attr('font-size', 20);
         scale_str.text("水平 1：" + scaleX + "    垂直1：" + scaleY);
 
-        let section_name = head_layer.append('text');
-        section_name.attr('x', '50%').attr('y', 125).attr('fontSize', 20);
-        section_name.text("{{ section.name }}--{{ section.name }}'");
+
 
 
         paper.append('rect').attr('x', 0)
@@ -135,6 +137,15 @@
             y1 = offsetY - '{{ hLine[0].y }}' / scaleY;
             x2 = offsetX + '{{ hLine[1].x }}' / scaleX;
             y2 = offsetY - '{{ hLine[1].y }}' / scaleY;
+            holeName = hole_layer.append('text');
+            holeName.text('{{ section.holes[loop.index0].holeName }}');
+            holeName.attr('x', parseInt(x1 * scale))
+                .attr('y', parseInt(0.022 * scale))
+                .attr('font-size', "20")
+                .attr('text-anchor', 'middle');
+
+
+
             hole_layer.append('line')
                 .attr('x1', parseInt(x1 * scale))
                 .attr('y1', parseInt(y1 * scale))
