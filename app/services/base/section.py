@@ -12,8 +12,8 @@
 import math
 
 from app.services.base.func import AcPoint
-from .hole import Hole
 from app.services.geometry.line import Line
+from .hole import Hole
 
 
 class Paper:
@@ -72,6 +72,7 @@ class Section:
         self._items = []
         self._hlines = []
         self._paper = Paper(self)
+        self._layers = []
 
     @property
     def items(self):
@@ -143,12 +144,9 @@ class Section:
             ax = self.dss[hole_index]
             al = aHole.layers[0]
             pt = AcPoint(ax, aHole.elevation)
-            if hole_index == 0:
-                layer.top_curve.append_point(pt.offset_x(- extra_dist))
             # 1-2添加A点
             layer.top_curve.append_point(pt)
             if hole_index == HNUM - 1:
-                layer.top_curve.append_point(pt.offset_x(extra_dist))
                 break
             hole_index = hole_index + 1
 
@@ -168,7 +166,7 @@ class Section:
                 layer.top_curve.append_point(pt)
 
         # 第二部分：画各层的层底线
-        for layer_index in range(LCOUNT - 1):
+        for layer_index in range(LCOUNT):
             # 初始化
             hole_index = 0
             layer = layers[layer_index]
@@ -180,19 +178,15 @@ class Section:
                 aHole = self.holes[hole_index]
                 ax = self.dss[hole_index]
                 # (1)若A孔已到层底，直接跳到下一次循环，此处未考虑A孔与右侧孔存在层位相交错情况，日后可优化！！！
-                if layer_index >= len(aHole.layers) - 1:
+                if layer_index > len(aHole.layers) - 1:
                     hole_index = hole_index + 1
                     continue
                 # (2)若A孔未到层底,：画A孔层底线
                 aLayer = aHole.layers[layer_index]
                 ay = aHole.elevation - aLayer.endDep
                 ptA = AcPoint(ax, ay)
-                # 处理当前层层底左延伸线
-                if hole_index == 0:
-                    layer.bottom_curve.append_point(ptA.offset_x(-extra_dist))
                 layer.bottom_curve.append_point(ptA)
                 if hole_index == HNUM - 1:
-                    layer.bottom_curve.append_point(ptA.offset_x(extra_dist))
                     break
 
                 hole_index = hole_index + 1
@@ -200,7 +194,7 @@ class Section:
                     bHole = self.holes[hole_index]
                     bx = self.dss[hole_index]
                     # 判断当前B孔是否已到层底，若未到层底，连线，否则自增长
-                    if layer_index >= len(bHole.layers) - 1:
+                    if layer_index > len(bHole.layers) - 1:
                         hole_index = hole_index + 1
                         # 增加类似美化功能，例如K043-2015-4中的D剖面
                         continue
@@ -227,4 +221,32 @@ class Section:
                         if aLayer.thickness == 0 and bl.thickness == 0:
                             layer.bottom_curve.concat(layer.top_curve.slice(ptA, ptB))
                         break
-        return layers
+        self._layers = layers
+        return self._layers
+
+    def fill_layer(self):
+        lines = []
+        sx = 1 / self._paper.scale.x
+        sy = 1 / self._paper.scale.y
+        delta = 0.01
+        left = -int(math.ceil(self.top / delta)) - 1
+        right = int(math.ceil((self.dss[-1] - self.bottom) / delta)) + 3
+        for layer in self._layers:
+            top_curve = layer.top_curve.scale(sx, sy)
+            bottom_curve = layer.bottom_curve.scale(sx, sy)
+            for i in range(left, right):
+                silt_clay = Line(AcPoint(-1000, -1000 - delta * i), AcPoint(5000, 5000 - delta * i))
+                pt1 = bottom_curve.intersect(silt_clay)
+                pt2 = top_curve.intersect(silt_clay)
+                if pt1 and pt2:
+                    line = Line(pt1, pt2)
+                    lines.append(line)
+                if (not pt1) and pt2:
+                    x = top_curve.get_points()[0].x
+                    line = Line(silt_clay.x2y(x), pt2)
+                    lines.append(line)
+                if pt1 and (not pt2):
+                    x = top_curve.get_points()[-1].x
+                    line = Line(pt1, silt_clay.x2y(x))
+                    lines.append(line)
+        return lines

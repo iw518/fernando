@@ -11,20 +11,18 @@
 # -------------------------------------------------------------------------------
 import math
 
+
 class AcPoint:
     def __init__(self, x=0.0, y=0.0, z=0.0):
         self.x = x
         self.y = y
         self.z = z
 
-    def offset_x(self, delta):
-        return AcPoint(self.x + delta, self.y, self.z)
+    def offset(self, ox=0, oy=0, oz=0):
+        return AcPoint(self.x + ox, self.y + oy, self.z + oz)
 
-    def offset_y(self, delta):
-        return AcPoint(self.x, self.y + delta, self.z)
-
-    def offset_z(self, delta):
-        return AcPoint(self.x, self.y, self.z + delta)
+    def scale(self, sx=1, sy=1, sz=1):
+        return AcPoint(self.x * sx, self.y * sy, self.z * sz)
 
     def __str__(self):
         return "(x=%.4f,y=%.4f)" % (self.x, self.y)

@@ -18,11 +18,11 @@ class Curve:
         self._points = []
         self._lines = []
 
-    def get_lines(self):
-        return self._lines
-
     def get_points(self):
         return self._points
+
+    def get_lines(self):
+        return self._lines
 
     def x2y(self, x):
         points = []
@@ -30,7 +30,7 @@ class Curve:
             pt = line.x2y(x)
             if pt:
                 points.append(pt)
-        if len(points) >= 1:
+        if 0 < len(points) < 3:
             return points[0]
         else:
             return None
@@ -42,7 +42,7 @@ class Curve:
             pt = line.y2x(y)
             if pt:
                 points.append(pt)
-        if len(points) >= 1:
+        if 0 < len(points) < 3:
             return points[0]
         else:
             return None
@@ -66,20 +66,32 @@ class Curve:
 
     def append_point(self, pt):
         self._points.append(pt)
-        if len(self._points) > 1:
-            pt1 = self._points[-2]
-            pt2 = self._points[-1]
-            line = Line(pt1, pt2)
-            self._lines.append(line)
+        num = len(self._points)
+        if num > 1:
+            pt1 = self._points[- 2]
+            pt2 = self._points[- 1]
+            self._lines.append(Line(pt1, pt2))
 
     def append_line(self, line):
         if len(self._points) == 0:
-            self._points.append(line.pt1)
-            self._points.append(line.pt2)
+            self.append_point(line.pt1)
+            self.append_point(line.pt2)
         elif line.pt1.x == self._points[-1].x:
-            self._points.append(line.pt2)
+            self.append_point(line.pt2)
         elif line.pt2.x == self._points[-1].x:
-            self._points.append(line.pt1)
+            self.append_point(line.pt1)
         else:
-            self._points.append(line.pt1)
-            self._points.append(line.pt2)
+            self.append_point(line.pt1)
+            self.append_point(line.pt2)
+
+    def scale(self, sx=1, sy=1):
+        curve = Curve()
+        for pt in self.get_points():
+            curve.append_point(pt.scale(sx, sy))
+        return curve
+
+    def offset(self, ox=0, oy=0):
+        curve = Curve()
+        for pt in self.get_points():
+            curve.append_point(pt.offset(ox, oy))
+        return curve

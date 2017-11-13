@@ -90,6 +90,10 @@ class Line:
             else:
                 return None
 
+    def offset(self, ox=0, oy=0):
+        line = Line(self.pt1.offset(ox, oy), self.pt2.offset(ox, oy))
+        return line
+
 
 def test():
     a = [AcPoint(-32697.1588, -39666.0098),

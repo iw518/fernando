@@ -1,51 +1,54 @@
 <ul>
-    {% if projectNo is defined and projectNo!=''%}
-    <li><a href="#"><i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;数据录入</a>
-        <ul>
-            <li><a href="{{url_for('logginData.layersInf', projectNo=projectNo, _external=True)}}">地层信息</a></li>
-            <li><a href="{{url_for('logginData.holesInf', projectNo=projectNo, _external=True)}}">勘探孔数据</a></li>
-        </ul>
-    </li>
-    <li><a href="#"><i class="fa fa-calculator"></i>&nbsp;&nbsp;计算书</a>
-        <ul>
-            <li><a href="{{ url_for('calc.water',projectNo=projectNo,_external=True) }}"><i class="fa fa-tint"
-                                                                                            aria-hidden="true"></i>&nbsp;&nbsp;水位表</a>
-            </li>
-            <li><a href="{{ url_for('calc.liquefaction',projectNo=projectNo,_external=True) }}">液化判别</a></li>
-            <li><a href="{{ url_for('calc.natural_foundation',projectNo=projectNo,_external=True) }}">天然地基</a></li>
-            <li><a href="{{ url_for('calc.pile',projectNo=projectNo,_external=True) }}">桩基</a></li>
-        </ul>
-    </li>
-    <li><a href="#"><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;成果图表</a>
-        <ul>
-            <li><a href="{{ url_for('printing.prtcptdata',projectNo=projectNo,_external=True) }}">静力触探曲线图表</a></li>
-            <li><a href="{{ url_for('printing.ztk',projectNo=projectNo,_external=True) }}">钻孔柱状图</a></li>
-            <li><a href="{{ url_for('printing.pmt',projectNo=projectNo,_external=True) }}">工程地质剖面图</a></li>
-        </ul>
-    </li>
-    <li><a href="#"><i class="fa fa-line-chart"></i>&nbsp;&nbsp;指标分析</a>
-        <ul>
-            <li><a href="{{url_for('analysis.cptAnalysis',projectNo=projectNo, _external=True)}}">静力触探指标分析</a></li>
-            <li><a href="{{url_for('analysis.layerAnalysis',projectNo=projectNo, _external=True)}}">层位埋深指标分析</a></li>
-        </ul>
-    </li>
-    <li><a href="#"><i class="fa fa-pie-chart"></i>&nbsp;&nbsp;统计汇总</a>
-        <ul>
-            <li><a href="{{ url_for('stats.workloads',projectNo=projectNo,_external=True) }}">工作量统计</a></li>
-            <li><a href="{{ url_for('stats.excavation',projectNo=projectNo,_external=True) }}">基坑参数统计</a></li>
-        </ul>
-    </li>
-    <li><a href="#"><i class="fa fa-bug"></i>&nbsp;&nbsp;校审意见</a>
-        <ul>
-            <li><a href="{{ url_for('audit.report_check',projectNo=projectNo,_external=True) }}">报告审核</a></li>
-        </ul>            
-    </li>
-    <li><a href="#"><i class="fa fa-camera"></i>&nbsp;&nbsp;野外记录</a>
-        <ul>
-            <li><a href="{{ url_for('situ.sitePhoto', projectNo=projectNo, _external=True) }}">踏勘实景</a></li>
-            <li><a href="{{ url_for('situ.siteMap', projectNo=projectNo, _external=True) }}">全景地图</a></li>
-        </ul>
-    </li>
+    {% if projectNo is defined and projectNo!='' %}
+        <li><a href="#"><i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;数据录入</a>
+            <ul>
+                <li><a href="{{ url_for('logginData.layersInf', projectNo=projectNo, _external=True) }}">地层信息</a></li>
+                <li><a href="{{ url_for('logginData.holesInf', projectNo=projectNo, _external=True) }}">勘探孔数据</a></li>
+            </ul>
+        </li>
+        <li><a href="#"><i class="fa fa-calculator"></i>&nbsp;&nbsp;计算书</a>
+            <ul>
+                <li><a href="{{ url_for('calc.water',projectNo=projectNo,_external=True) }}"><i class="fa fa-tint"
+                                                                                                aria-hidden="true"></i>&nbsp;&nbsp;水位表</a>
+                </li>
+                <li><a href="{{ url_for('calc.liquefaction',projectNo=projectNo,_external=True) }}">液化判别</a></li>
+                <li><a href="{{ url_for('calc.natural_foundation',projectNo=projectNo,_external=True) }}">天然地基</a></li>
+                <li><a href="{{ url_for('calc.pile',projectNo=projectNo,_external=True) }}">桩基</a></li>
+            </ul>
+        </li>
+        <li><a href="#"><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;成果图表</a>
+            <ul>
+                <li><a href="{{ url_for('printing.prtcptdata',projectNo=projectNo,_external=True) }}">静力触探曲线图表</a></li>
+                <li><a href="{{ url_for('printing.ztk',projectNo=projectNo,_external=True) }}">钻孔柱状图</a></li>
+                <li><a href="{{ url_for('printing.pmt',sectionNo=1,projectNo=projectNo, _external=True) }}">工程地质剖面图</a>
+                </li>
+            </ul>
+        </li>
+        <li><a href="#"><i class="fa fa-line-chart"></i>&nbsp;&nbsp;指标分析</a>
+            <ul>
+                <li><a href="{{ url_for('analysis.cptAnalysis',projectNo=projectNo, _external=True) }}">静力触探指标分析</a>
+                </li>
+                <li><a href="{{ url_for('analysis.layerAnalysis',projectNo=projectNo, _external=True) }}">层位埋深指标分析</a>
+                </li>
+            </ul>
+        </li>
+        <li><a href="#"><i class="fa fa-pie-chart"></i>&nbsp;&nbsp;统计汇总</a>
+            <ul>
+                <li><a href="{{ url_for('stats.workloads',projectNo=projectNo,_external=True) }}">工作量统计</a></li>
+                <li><a href="{{ url_for('stats.excavation',projectNo=projectNo,_external=True) }}">基坑参数统计</a></li>
+            </ul>
+        </li>
+        <li><a href="#"><i class="fa fa-bug"></i>&nbsp;&nbsp;校审意见</a>
+            <ul>
+                <li><a href="{{ url_for('audit.report_check',projectNo=projectNo,_external=True) }}">报告审核</a></li>
+            </ul>
+        </li>
+        <li><a href="#"><i class="fa fa-camera"></i>&nbsp;&nbsp;野外记录</a>
+            <ul>
+                <li><a href="{{ url_for('situ.sitePhoto', projectNo=projectNo, _external=True) }}">踏勘实景</a></li>
+                <li><a href="{{ url_for('situ.siteMap', projectNo=projectNo, _external=True) }}">全景地图</a></li>
+            </ul>
+        </li>
     {% endif %}
     <li><a href="#"><i class="fa fa-search-plus" aria-hidden="true"></i>&nbsp;&nbsp;数据导入</a>
         <ul>
@@ -65,20 +68,20 @@
     </li>
     <li><a href="#"><i class="fa fa-sitemap" aria-hidden="true"></i>&nbsp;&nbsp;项目管理</a>
         <ul>
-            <li><a href="{{url_for('order.register', _external=True)}}">项目注册</a></li>
-            <li><a href="{{url_for('order.employee', _external=True)}}">项目人员</a></li>
-            <li><a href="{{url_for('order.build_inf', projectNo=projectNo, _external=True)}}">参建信息</a></li>
-            <li><a href="{{url_for('order.fund', projectNo=projectNo, _external=True)}}">财务信息</a></li>
-        </ul>            
+            <li><a href="{{ url_for('order.register', _external=True) }}">项目注册</a></li>
+            <li><a href="{{ url_for('order.employee', _external=True) }}">项目人员</a></li>
+            <li><a href="{{ url_for('order.build_inf', projectNo=projectNo, _external=True) }}">参建信息</a></li>
+            <li><a href="{{ url_for('order.fund', projectNo=projectNo, _external=True) }}">财务信息</a></li>
+        </ul>
     </li>
     <li><a href="#"><i class="fa fa-users" aria-hidden="true"></i>&nbsp;&nbsp;人员管理</a>
         <ul>
-            <li><a href="{{url_for('hr.team_manage', _external=True)}}">人员分配</a></li>
+            <li><a href="{{ url_for('hr.team_manage', _external=True) }}">人员分配</a></li>
         </ul>
     </li>
     <li><a href="#"><i class="fa fa-search-plus" aria-hidden="true"></i>&nbsp;&nbsp;信息查询</a>
         <ul>
-            <li><a href="{{url_for('personal.index', _external=True)}}">项目归档</a></li>
+            <li><a href="{{ url_for('personal.index', _external=True) }}">项目归档</a></li>
         </ul>
     </li>
 </ul>

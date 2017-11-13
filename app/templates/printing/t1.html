@@ -1,0 +1,71 @@
+<ul class="tabs">
+    <li class="active"><a href="#tab1"><i class="fa fa-code"></i>剖面代码</a></li>
+    <li><a href="#tab2"><i class="fa fa-eye" aria-hidden="true"></i>剖面预览</a></li>
+</ul>
+<div class="tab_container">
+    <div id="tab1" class="tab_content" style="display: none; ">
+        <div class="row">
+            <div class="col-sm-2" id='tree'></div>
+            <div class="col-sm-10" id="section_expand"></div>
+        </div>
+    </div>
+    <div id="tab2" class="tab_content" style="display: block; ">
+        <div class="row">
+            <div class="col-sm-12">
+                <svg id='paper' style='width:1000px;height:800px;'></svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+<script>
+
+
+    /**
+     * Created by Administrator on 2017/3/3 0003.
+     */
+
+    var paper = d3.select("#paper");
+    paper.selectAll("*").remove();
+
+    plotting_scale(15);
+
+    //画比例尺
+    function plotting_scale(n) {
+        for (var i = 1; i < n; i++) {
+            var rect = paper.append('rect')
+                .attr('x', 10)
+                .attr('y', (i - 1) * 40)
+                .attr('width', 5)
+                .attr('height', 40);
+            console.log(rect);
+
+
+            if (i % 2 == 1) {
+                paper.append('line').attr('x1', 10).attr('y1', (i - 1) * 40).attr('x2', 50).attr('y2', (i - 1) * 40).style({
+                    stroke: "#000",
+                    strokeWidth: 1
+                });
+                paper.append('line').attr('x1', 10).attr('y1', (i - 1) * 40).attr('x2', 50).attr('y2', (i - 1) * 40).style({
+                    stroke: "#000",
+                    strokeWidth: 1
+                });
+                paper.append('text')
+                    .attr('x', 50)
+                    .attr('y', (i - 1) * 40)
+                    .attr('value', i);
+            }
+            else {
+                rect.style({
+                    stroke: "red",
+                    strokeWidth: "1px"
+                });
+            }
+        }
+
+    }
+</script>
+
