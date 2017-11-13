@@ -9,13 +9,27 @@
 # Copyright:   (c) Administrator 2015
 # Licence:     <GPLV3>
 # -------------------------------------------------------------------------------
-
+import math
 
 class AcPoint:
     def __init__(self, x=0.0, y=0.0, z=0.0):
         self.x = x
         self.y = y
         self.z = z
+
+    def offset_x(self, delta):
+        return AcPoint(self.x + delta, self.y, self.z)
+
+    def offset_y(self, delta):
+        return AcPoint(self.x, self.y + delta, self.z)
+
+    def offset_z(self, delta):
+        return AcPoint(self.x, self.y, self.z + delta)
+
+    def __str__(self):
+        return "(x=%.4f,y=%.4f)" % (self.x, self.y)
+
+    __repr__ = __str__
 
 
 class SuperList(list):
@@ -41,10 +55,30 @@ def extract_element(objs, my_attr, my_attr_value):
 
 
 def iszero(num):
-    import sys
-    if (num - sys.float_info.epsilon) * (num + sys.float_info.epsilon) <= 0:
+    # import sys
+    # sys.float_info.epsilon
+    # 有时候并不一定是epsilon
+    MINIMUM = math.pow(10, -10)
+    if (num - MINIMUM) * (num + MINIMUM) <= 0:
         return True
     return False
+
+
+def paired_points(base_points, pt1, pt2):
+    # base_points必须是按照X从左至右排序，否则本函数必须先排序
+    # pt1,pt2传入时可不按照X从左至右排序，本函数会将其排序
+    left_pt = pt1
+    right_pt = pt2
+    if pt1.x > pt2.x:
+        left_pt = pt2
+        right_pt = pt1
+    points = [left_pt, right_pt]
+    for n in range(len(base_points)):
+        if base_points[n].x < left_pt.x:
+            points.insert(points.index(left_pt), base_points[n])
+        elif base_points[n].x > right_pt.x:
+            points.append(base_points[n])
+    return points
 
 
 def AddDate(xDate, num=1):

@@ -14,6 +14,7 @@ import math
 from .func import *
 from .pmline import Pmline
 from .point import Points
+from ..geometry.curve import Curve
 
 DICT_FK_PS = {'粘土': (68, 0.135, 1.5, 1.1, 0),
               '淤泥质': (58, 0.125, 0.8, 1.0, 0),
@@ -65,7 +66,8 @@ class Layer:
         self.SoilPoints = []
         self.__points = Points()
         self.pmline = None
-
+        self.top_curve = Curve()
+        self.bottom_curve = Curve()
 
     @property
     def thickness(self):
@@ -84,6 +86,7 @@ class Layer:
 
     def gen_pmline(self, *args):
         self.pmline = Pmline(*args)
+
 
 class Layers(list):
     def append(self, item):

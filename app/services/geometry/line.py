@@ -5,7 +5,7 @@
 # author:       fernando
 # license:      MIT License
 # contact:      iw518@163.com
-# purpose:      line_func
+# purpose:      line
 # date:         2017-10-31
 # copyright:    copyright  2017 Xu, Aiwu
 # -------------------------------------------------------------------------------
@@ -34,11 +34,29 @@ class Line:
             self.A = (y1 - y2) / (x1 * y2 - x2 * y1)
             self.B = -(x1 - x2) / (x1 * y2 - x2 * y1)
             self.C = 1
-
         def wrapper(pt):
             return self.A * pt.x + self.B * pt.y + self.C
-
         return wrapper
+
+    def x2y(self, x):
+        if not iszero(self.B):
+            y = -self.f(AcPoint(x, 0)) / self.B
+            pt = AcPoint(x, y)
+            if self.isexsit(pt):
+                return pt
+            else:
+                return None
+        return None
+
+    def y2x(self, y):
+        if not iszero(self.A):
+            x = -self.f(AcPoint(0, y)) / self.A
+            pt = AcPoint(x, y)
+            if self.isexsit(pt):
+                return pt
+            else:
+                return None
+        return None
 
     def isexsit(self, pt):
         x = pt.x
@@ -48,7 +66,8 @@ class Line:
         x2 = self.pt2.x
         y2 = self.pt2.y
         f = self.f(pt)
-        if (x - x1) * (x - x2) <= 0 and (y - y1) * (y - y2) <= 0 and iszero(f):
+        if (round(x, 8) - round(x1, 8)) * (round(x, 8) - round(x2, 8)) <= 0 and (round(y, 8) - round(y1, 8)) * (
+            round(y, 8) - round(y2, 8)) <= 0 and round(f, 8) == 0:
             return True
         else:
             return False
@@ -72,15 +91,19 @@ class Line:
                 return None
 
 
-M = [AcPoint(-32697.1588, -39666.0098),
-     AcPoint(-29394.9287, -40395.1101),
-     AcPoint(-30092.4929, -42249.8391),
-     AcPoint(-33170.7344, -42217.8610),
-     AcPoint(-34431.4695, -40740.4734), AcPoint(-32697.1588, -39666.0098)]
-line = Line(AcPoint(-34437.8692, -42160.3004), AcPoint(-29465.3251, -39512.5149))
+def test():
+    a = [AcPoint(-32697.1588, -39666.0098),
+         AcPoint(-29394.9287, -40395.1101),
+         AcPoint(-30092.4929, -42249.8391),
+         AcPoint(-33170.7344, -42217.8610),
+         AcPoint(-34431.4695, -40740.4734), AcPoint(-32697.1588, -39666.0098)]
+    b = Line(AcPoint(-34437.8692, -42160.3004), AcPoint(-29465.3251, -39512.5149))
 
-for i in range(len(M) - 1):
-    line1 = Line(M[i], M[i + 1])
-    a = line.intersect(line1)
-    if a:
-        print("x={},y={}".format(a.x, a.y))
+    for i in range(len(a) - 1):
+        c = Line(a[i], a[i + 1])
+        d = b.intersect(c)
+        if a:
+            print(d)
+
+
+test()

@@ -30,7 +30,7 @@
     {{ super() }}
     <script type="text/javascript" src="{{ url_for('static', filename='js/jqTree/tree.jquery.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/custom/section/data.js') }}"></script>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="http://apps.bdimg.com/libs/d3/3.4.8/d3.min.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/custom/section/texture.js') }}"></script>
     <script>
 
@@ -74,8 +74,6 @@
         let scale_str = head_layer.append('text');
         scale_str.attr('x', '50%').attr('y', 75).attr('font-size', 20);
         scale_str.text("水平 1：" + scaleX + "    垂直1：" + scaleY);
-
-
 
 
         paper.append('rect').attr('x', 0)
@@ -144,8 +142,6 @@
                 .attr('font-size', "20")
                 .attr('text-anchor', 'middle');
 
-
-
             hole_layer.append('line')
                 .attr('x1', parseInt(x1 * scale))
                 .attr('y1', parseInt(y1 * scale))
@@ -158,69 +154,103 @@
         /*画剖面线 */
         let curve_layer = paper.append('g');
         curve_layer.attr('id', 'curve_layer');
-        {% for curve in curves %}
-            {% for i in range(curve|length-1) %}
-                x1 = offsetX + {{ curve[i].x }}/scaleX;
-                y1 = offsetY - {{ curve[i].y }}/scaleY;
-                x2 = offsetX + {{ curve[i + 1].x }}/scaleX;
-                y2 = offsetY - {{ curve[i + 1].y }}/scaleY;
+        {% for layer in layers %}
+            {% if loop.index==8 %}
+                color = "red";
+            {% else %}
+                color = "#000";
+            {% endif %}
+            {% for line in layer.top_curve.get_lines() %}
+                x1 = offsetX + {{line.pt1.x}}/scaleX;
+                y1 = offsetY - {{line.pt1.y}}/scaleY;
+                x2 = offsetX + {{line.pt2.x}}/scaleX;
+                y2 = offsetY - {{line.pt2.y}}/scaleY;
                 curve_layer.append('line')
                     .attr('x1', parseInt(x1 * scale))
                     .attr('y1', parseInt(y1 * scale))
                     .attr('x2', parseInt(x2 * scale))
                     .attr('y2', parseInt(y2 * scale))
-                    .attr('stroke', "#000")
+                    .attr('stroke', color)
                     .attr('stroke-width', 1);
-
             {% endfor %}
         {% endfor %}
 
 
-
-        /*填充剖面 */
-        let fill_layer = paper.append('g');
-        fill_layer.attr('id', 'fill_layer');
-
-        console.log(view_scale());
-        /*粉质粘土 */
-        var t0 =
-            textures.paths()
-                .d("siltclay").size(16 * view_scale())
-                .lighter();
-        /*粘土 */
-        var t1 =
-            textures.paths()
-                .d("clay").size(15 * view_scale())
-                .lighter().stroke("darkorange");
-
-        var t2 = textures.lines()
-            .lighter();
-        paper.call(t0);
-        paper.call(t1);
-
-        var polygon_points = '';
-        {% for i in range(curves|length-1) %}
-            {% for point in curves[i] %}
-                x1 = (offsetX + {{ point.x }} /scaleX)* scale;
-                y1 = (offsetY - {{ point.y }} /scaleY)* scale;
-                polygon_points = polygon_points + ' ' + parseInt(x1) + ',' + parseInt(y1);
-            {% endfor %}
-            {% for j in range(curves[i+1]|length) %}
-                {% set point=curves[i+1][curves[i+1]|length-1-j] %}
-                x1 = (offsetX + {{ point.x }} /scaleX)* scale;
-                y1 = (offsetY - {{ point.y }} /scaleY)* scale;
-                polygon_points = polygon_points + ' ' + parseInt(x1) + ',' + parseInt(y1);
-            {% endfor %}
-            {% if i%2==1 %}
-                fill_layer.append('polygon').attr('points', polygon_points).style(
-                    "fill", t0.url());
-
-            {% else %}
-                fill_layer.append('polygon').attr('points', polygon_points).style(
-                    "fill", t1.url());
-            {% endif %}
-            polygon_points = '';
+        /*画填充斜线 */
+        let flap_layer = paper.append('g');
+        flap_layer.attr('id', 'flap_layer');
+        console.log({{ lines|length }});
+        {% for line in lines %}
+            x1 = offsetX + {{line.pt1.x}}/scaleX;
+            y1 = offsetY - {{line.pt1.y}}/scaleY;
+            x2 = offsetX + {{line.pt2.x}}/scaleX;
+            y2 = offsetY - {{line.pt2.y}}/scaleY;
+            flap_layer.append('line')
+                .attr('x1', parseInt(x1 * scale))
+                .attr('y1', parseInt(y1 * scale))
+                .attr('x2', parseInt(x2 * scale))
+                .attr('y2', parseInt(y2 * scale))
+                .attr('stroke', "red")
+                .attr('stroke-width', 1);
         {% endfor %}
+
+
+        /*画层号 */
+        let layerNo_layer = paper.append('g');
+        curve_layer.attr('id', 'layerNo_layer');
+        {% for layer in layers[0:-1] %}
+            var layerNo = paper.append('text');
+            layerNo.text("{{ layer.layerNo }}");
+            x1 = offsetX + {{ layer.top_curve.get_lines()[-1].pt1.x}}/scaleX;
+            x2 = offsetX + {{ layer.top_curve.get_lines()[-1].pt2.x}}/scaleX;
+            y1 = offsetY - '{{ layer.top_curve.get_lines()[-1].pt1.y}}' / scaleY;
+            y2 = offsetY - '{{ layer.bottom_curve.get_lines()[-1].pt1.y}}' / scaleY;
+            x = (x1 + x2) / 2;
+            y = (y1 + y2) / 2;
+            layerNo.attr('x', parseInt(x * scale))
+                .attr('y', parseInt(y * scale))
+                .attr('font-size', "20");
+        {% endfor %}
+
+
+
+        {#        /*填充剖面 */
+                let fill_layer = paper.append('g');
+                fill_layer.attr('id', 'fill_layer');
+
+                console.log(view_scale());
+                /*粉质粘土 */
+                var t0 =
+                    textures.paths()
+                        .d("siltclay").size(16 * view_scale())
+                        .lighter();
+                /*粘土 */
+                var t1 =
+                    textures.paths()
+                        .d("clay").size(15 * view_scale())
+                        .lighter().stroke("darkorange");
+
+                var t2 = textures.lines()
+                    .lighter();
+                paper.call(t0);
+                paper.call(t1);
+
+                {% for layer in layers[0:-1] %}
+                    polygon_points = '';
+                    {% for point in layer.top_curve.get_points() %}
+                        x1 = (offsetX + {{ point.x }} /scaleX)* scale;
+                        y1 = (offsetY - {{ point.y }} /scaleY)* scale;
+                        polygon_points = polygon_points + ' ' + parseInt(x1) + ',' + parseInt(y1);
+                    {% endfor %}
+                    {% for point in layer.bottom_curve.get_points()[::-1] %}
+                        x1 = (offsetX + {{ point.x }} /scaleX)* scale;
+                        y1 = (offsetY - {{ point.y }} /scaleY)* scale;
+                        polygon_points = polygon_points + ' ' + parseInt(x1) + ',' + parseInt(y1);
+                    {% endfor %}
+                    console.log(polygon_points);
+                    fill_layer.append('polygon').attr('points', polygon_points).style(
+                        "fill", t0.url());
+                {% endfor %}#}
 
         function view_scale() {
             //计算宽度
