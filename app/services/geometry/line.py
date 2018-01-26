@@ -9,7 +9,8 @@
 # date:         2017-10-31
 # copyright:    copyright  2017 Xu, Aiwu
 # -------------------------------------------------------------------------------
-from app.services.base.func import AcPoint, iszero
+from app.services.base.func import iszero
+from app.services.geometry.point import Point
 
 
 class Line:
@@ -20,6 +21,16 @@ class Line:
         self.B = 0
         self.C = 0
         self.f = self.func()
+        self.style = {}
+
+    @property
+    def attr(self, key):
+        return self.style.get(key, None)
+
+    @attr.setter
+    def attr(self, key, value):
+        self.style[key] = value
+
 
     def func(self):
         x1 = self.pt1.x
@@ -40,8 +51,8 @@ class Line:
 
     def x2y(self, x):
         if not iszero(self.B):
-            y = -self.f(AcPoint(x, 0)) / self.B
-            pt = AcPoint(x, y)
+            y = -self.f(Point(x, 0)) / self.B
+            pt = Point(x, y)
             if self.isexsit(pt):
                 return pt
             else:
@@ -50,8 +61,8 @@ class Line:
 
     def y2x(self, y):
         if not iszero(self.A):
-            x = -self.f(AcPoint(0, y)) / self.A
-            pt = AcPoint(x, y)
+            x = -self.f(Point(0, y)) / self.A
+            pt = Point(x, y)
             if self.isexsit(pt):
                 return pt
             else:
@@ -84,24 +95,36 @@ class Line:
         else:
             x = -(B1 * C2 - B2 * C1) / (A2 * B1 - A1 * B2)
             y = (A1 * C2 - A2 * C1) / (A2 * B1 - A1 * B2)
-            pt = AcPoint(x, y)
+            pt = Point(x, y)
             if self.isexsit(pt) and line.isexsit(pt):
-                return AcPoint(x, y)
+                return Point(x, y)
             else:
                 return None
 
     def offset(self, ox=0, oy=0):
         line = Line(self.pt1.offset(ox, oy), self.pt2.offset(ox, oy))
+        line.style = self.style
+        return line
+
+    def scale(self, sx=1, sy=1):
+        line = Line(self.pt1.scale(sx, sy), self.pt2.scale(sx, sy))
         return line
 
 
+class SiltLine(Line):
+    def __init__(self):
+        pass
+
+
+
+
 def test():
-    a = [AcPoint(-32697.1588, -39666.0098),
-         AcPoint(-29394.9287, -40395.1101),
-         AcPoint(-30092.4929, -42249.8391),
-         AcPoint(-33170.7344, -42217.8610),
-         AcPoint(-34431.4695, -40740.4734), AcPoint(-32697.1588, -39666.0098)]
-    b = Line(AcPoint(-34437.8692, -42160.3004), AcPoint(-29465.3251, -39512.5149))
+    a = [Point(-32697.1588, -39666.0098),
+         Point(-29394.9287, -40395.1101),
+         Point(-30092.4929, -42249.8391),
+         Point(-33170.7344, -42217.8610),
+         Point(-34431.4695, -40740.4734), Point(-32697.1588, -39666.0098)]
+    b = Line(Point(-34437.8692, -42160.3004), Point(-29465.3251, -39512.5149))
 
     for i in range(len(a) - 1):
         c = Line(a[i], a[i + 1])

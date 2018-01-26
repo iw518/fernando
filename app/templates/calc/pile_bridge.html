@@ -25,76 +25,32 @@
     </div>
     <div class="row">
         <div id="setting_div" class="col-sm-10 col-sm-offset-1" style="display: none">
-            <div class="radio-group">
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="optionsRadios" id="optionsRadios1" value="6.0" checked>
-                        其他区域浅层fs按照6m分界
-                    </label>
-                </div>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="optionsRadios" id="optionsRadios2" value="4.0">
-                        湖沼平原Ⅰ-1区浅层按照4m分界
-                    </label>
-                </div>
-            </div>
             <table id="setting_table" class='hor-calculate'>
                 <thead>
                 <tr>
                     <th width="10%" rowspan="2">土层编号</th>
                     <th width="25%" rowspan="2">土层名称</th>
-                    <th width="10%" rowspan="2">比贯入阻力Ps(MPa)</th>
-                    <th width="20%" style="border-bottom: 1px solid #6678b1;" colspan="2">预制桩桩基参数</th>
+                    <th width="10%" rowspan="2">液性指数 Il</th>
+                    <th width="10%" rowspan="2">标贯击数</th>
                     <th width="20%" style="border-bottom: 1px solid #6678b1;" colspan="2">灌注桩桩基参数</th>
-                    <th width="5%" rowspan="2">抗拔<br>系数&lambda;</th>
                     <th width="10%" rowspan="2">备注</th>
                 </tr>
                 <tr>
-                    <th>fs(kPa)</th>
-                    <th>fp(kPa)</th>
                     <th>fs(kPa)</th>
                     <th>fp(kPa)</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for layer in layers %}
-                    {% if layer.layerNo in repeat_layerNolist %}
-                        <tr class="layer_tr">
-                            <td class="layerNo">{{ layer.layerNo }}</td>
-                            <td>{{ layer.layerName }}</td>
-                            <td>{{ layer.AVG_Ps }}</td>
-                            <td class="fs"><input type="text"></td>
-                            <td class="fp"><input type="text"></td>
-                            <td class="fs"><input type="text"></td>
-                            <td class="fp"><input type="text"></td>
-                            <td class="mylambda"><input type="text"></td>
-                            <td class="notation">6m以上</td>
-                        </tr>
-                        <tr class="layer_tr">
-                            <td class="layerNo">{{ layer.layerNo }}</td>
-                            <td>{{ layer.layerName }}</td>
-                            <td>{{ layer.AVG_Ps }}</td>
-                            <td class="fs"><input type="text"></td>
-                            <td class="fp"><input type="text"></td>
-                            <td class="fs"><input type="text"></td>
-                            <td class="fp"><input type="text"></td>
-                            <td class="mylambda"><input type="text"></td>
-                            <td class="notation">6m以下</td>
-                        </tr>
-                    {% else %}
-                        <tr class="layer_tr">
-                            <td class="layerNo">{{ layer.layerNo }}</td>
-                            <td>{{ layer.layerName }}</td>
-                            <td>{{ layer.AVG_Ps }}</td>
-                            <td class="fs"><input type="text"></td>
-                            <td class="fp"><input type="text"></td>
-                            <td class="fs"><input type="text"></td>
-                            <td class="fp"><input type="text"></td>
-                            <td class="mylambda"><input type="text"></td>
-                            <td class="notation"></td>
-                        </tr>
-                    {% endif %}
+                    <tr class="layer_tr">
+                        <td class="layerNo">{{ layer.layerNo }}</td>
+                        <td>{{ layer.layerName }}</td>
+                        <td></td>
+                        <td></td>
+                        <td class="qik"><input type="text"></td>
+                        <td class="fa0"><input type="text"></td>
+                        <td class="notation"></td>
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -112,7 +68,7 @@
             <div class="col-sm-10 col-sm-offset-1">
                 <p>计算条件及依据:</p>
                 <ol>
-                    <li>按上海市工程建设规范《地基基础设计规范》（DGJ08-11-2010）第7.2条有关公式计算。</li>
+                    <li>按中华人民共和国行业标准《公路桥涵地基与基础设计规范》（JTG D63-2007）第5.3.3条有关公式计算。</li>
                     <li>按场地单孔地层分层资料计算，设计时应根据实际选用的桩长、桩径做调整。</li>
                     <li>单桩承载力未考虑预制桩强度及施工质量因素的影响。</li>
                     <li>建议进行单桩竖向抗压静载荷试验，并以试桩资料为准。</li>
@@ -126,19 +82,13 @@
                     <tr>
                         <th width="7%">计算孔号</th>
                         <th width="10%">桩型</th>
-                        <th width="7%">方桩边长<br/>管桩壁厚<br/>(mm)</th>
                         <th width="5%">圆桩<br/>直径<br/>(mm)</th>
                         <th width="5%">桩长<br/>(m)</th>
                         <th width="5%">桩顶<br/>埋深<br/>(m)</th>
                         <th width="5%">桩底<br/>埋深<br/>(m)</th>
                         <th width="6%">桩顶<br/>标高<br/>(m)</th>
                         <th width="6%">桩底<br/>标高<br/>(m)</th>
-                        <th width="8%">桩侧总极限<br/>摩阻力<br/>标准值<br/>Rsk(kN)</th>
-                        <th width="7%">桩端极限<br/>摩阻力<br/>标准值<br/>Rpk(kN)</th>
-                        <th width="7%">单桩极限<br/>承载力<br/>标准值<br/>Rk(kN)</th>
-                        <th width="7%">单桩竖向<br/>承载力<br/>设计值<br/>Rd(kN)</th>
-                        <th width="7%">单桩竖向<br/>承载力<br/>特征值<br/>Ra(kN)</th>
-                        <th width="8%">单桩竖向<br/>抗拔承载力<br/>设计值<br/>Rtd(kN)</th>
+                        <th width="7%">单桩竖向<br/>承载力<br/>容许值<br/>[Ra](kN)</th>
                     </tr>
                     </thead>
                     <tfoot>
@@ -150,19 +100,13 @@
                             <select class='piletype_select' size=1 style='margin:-2;' ondblclick='gen_tr(this)'
                                     onclick='load_type(this)'></select>
                         </td>
-                        <td><input type="text" name="side_or_thickness"></td>
                         <td><input type="text" name="diameter"></td>
                         <td><input type="text" name="pile_length"></td>
                         <td><input type="text" name="top_depth"></td>
                         <td class="bottom_depth"></td>
                         <td class="top_level"><input type="text" name="top_level"></td>
                         <td class="bottom_level"></td>
-                        <td class="Rsk"></td>
-                        <td class="Rpk"></td>
-                        <td class="Rk"></td>
-                        <td class="Rd"></td>
                         <td class="Ra"></td>
-                        <td class="Rtd"></td>
                     </tr>
                     </tbody>
                 </table>
@@ -174,22 +118,17 @@
                     <thead>
                     <tr>
                         <th width="10%" rowspan="2">土层编号</th>
-                        <th width="20%" rowspan="2">土层名称</th>
+                        <th width="25%" rowspan="2">土层名称</th>
                         <th width="15%" rowspan="2">分层深度(m)</th>
-                        <th width="20%" style="border-bottom: 1px solid #6678b1;" colspan="2">预制桩桩基参数</th>
                         <th width="20%" style="border-bottom: 1px solid #6678b1;" colspan="2">灌注桩桩基参数</th>
-                        <th width="10%" rowspan="2">抗拔系数&lambda;</th>
-                        <th width="5%" rowspan="2">备注</th>
+                        <th width="10%" rowspan="2">备注</th>
                     </tr>
                     <tr>
-                        <th>fs(kPa)</th>
-                        <th>fp(kPa)</th>
-                        <th>fs(kPa)</th>
-                        <th>fp(kPa)</th>
+                        <th>qik(kPa)</th>
+                        <th>fa0(kPa)</th>
                     </tr>
                     </thead>
                     <tbody>
-
                     </tbody>
                 </table>
             </div>
@@ -261,26 +200,19 @@
                         $(item).find("td").eq(2).find("input").val("");
                         $(item).find("td").eq(3).find("input").val("");
                         $(item).find("td").eq(4).find("input").val("");
-                        $(item).find("td").eq(5).find("input").val("");
-                        $(item).find("td").eq(6).text("");
-                        $(item).find("td").eq(7).find("input").val("");
-                        $(item).find("td:gt(7)").text("");
+                        $(item).find("td").eq(5).text("");
+                        $(item).find("td").eq(6).find("input").val("");
+                        $(item).find("td:gt(6)").text("");
                     });
                     $("#layertable tbody tr").remove();
-
-
-                    var dividing_line = Number($("#setting_div div.radio-group:first").find("input:radio[name='optionsRadios']:checked").val());
                     var set_rows = "#setting_table tr.layer_tr";
                     var last_tr = "#layertable tr.layer_tr:last";
                     var def_layertable_tr = "<tr class='layer_tr'>" +
                         "<td class='layerNo'></td>" +
                         "<td class='layerName'></td>" +
                         "<td class='endDep'></td>" +
-                        "<td class='fs'><input type='text'></td>" +
-                        "<td class='fp'><input type='text'></td>" +
-                        "<td class='fs'><input type='text'></td>" +
-                        "<td class='fp'><input type='text'></td>" +
-                        "<td class='mylambda'><input type='text'></td>" +
+                        "<td class='qik'><input type='text'></td>" +
+                        "<td class='fa0'><input type='text'></td>" +
                         "<td class='notation'></td>" +
                         "</tr>";
                     hole = JSON.parse(data);
@@ -293,21 +225,9 @@
                         $(last_tr).find("td.layerNo").text(layer.layerNo);
                         $(last_tr).find("td.layerName").text(layer.layerName);
                         $(last_tr).find("td.endDep").text(Number(layer.endDep).toFixed(1));
-                        $(last_tr).find("td:gt(2):lt(8)").each(function (index, item) {
-                            $(item).find("input").val($layer_rows.eq(0).find("td").eq(index + 3).find("input").val());
+                        $(last_tr).find("td:gt(2):lt(5)").each(function (index, item) {
+                            $(item).find("input").val($layer_rows.eq(0).find("td").eq(index + 4).find("input").val());
                         });
-                        if ((dividing_line - layer.startDep) * (dividing_line - layer.endDep) < 0) {
-                            $(last_tr).find("td.endDep").text(dividing_line.toFixed(1));
-
-                            $("#layertable").append(def_layertable_tr);
-                            $(last_tr).find("td.layerNo").text(layer.layerNo);
-                            $(last_tr).find("td.layerName").text(layer.layerName);
-                            $(last_tr).find("td.endDep").text(layer.endDep.toFixed(1)
-                            );
-                            $(last_tr).find("td:gt(2):lt(8)").each(function (index, item) {
-                                $(item).find("input").val($layer_rows.eq(1).find("td").eq(index + 3).find("input").val());
-                            });
-                        }
                     });
                     //$('#calculate').attr("disabled", false);
                 };
@@ -326,7 +246,7 @@
 
 
         function load_type(obj) {
-            var piletype_list = ["预制方桩", "PHC管桩", "钻孔灌注桩", "闭口钢管桩", "抗拔预制方桩", "抗拔钻孔灌注桩"];
+            var piletype_list = ["钻孔灌注桩", "挖孔灌注桩"];
             if (obj.options.length == 0) {
                 for (var i = 0; i < piletype_list.length; i++) {
                     var pile_option = new Option(piletype_list[i], i);
@@ -344,87 +264,60 @@
                 $("#result_table tr.result_tr:last>td:eq(1)>select:first>option").remove();
             }
         }
+
         $(function () {
             var buildData = function () {
                 var ret = [];
                 $("#layertable tbody:first>tr").each(function (index, item) {
-
-                    var myArray = [$(item).find("td").eq(2).text(),
-                        $(item).find("td").eq(3).find("input").val(),
-                        $(item).find("td").eq(4).find("input").val(),
-                        $(item).find("td").eq(5).find("input").val(),
-                        $(item).find("td").eq(6).find("input").val(),
-                        $(item).find("td").eq(7).find("input").val()];
+                    var myArray = [Number($(item).find("td").eq(2).text()),
+                        Number($(item).find("td").eq(3).find("input").val()),
+                        Number($(item).find("td").eq(4).find("input").val())];
                     ret.push(myArray);
                 });
                 return ret;
             };
-            var calcu_pile = function (top_depth, pile_length, data, offset) {
-                var rsk = 0;
-                var rpk = 0;
-                var rs_top = 0;
-                var rs_bottom = 0;
+            var calcu_pile = function (top_depth, pile_length, data) {
+                var qk = 0;
+                var qr = 0;
+
+                var m0 = 0.7;
+                var lambda = 0.85;
+                var k2 = 2.5;
+                var r2 = 8;
+                var qk_top = 0;
+
                 for (i in data) {
                     if (i == 0) {
-                        rs_top = data[i][0] * data[i][offset + 1];
+                        qk_top = data[i][0] * data[i][1];
                     }
                     else if (data[i][0] < top_depth) {
-                        rs_top = rs_top + (data[i][0] - data[i - 1][0]) * data[i][offset + 1];
+                        qk_top = qk_top + (data[i][0] - data[i - 1][0]) * data[i][1];
                     }
                     else {
-                        rs_top = rs_top + (top_depth - data[i - 1][0]) * data[i][offset + 1];
+                        qk_top = qk_top + (top_depth - data[i - 1][0]) * data[i][1];
                         break;
                     }
                 }
 
                 for (i in data) {
                     if (i == 0) {
-                        rs_bottom = data[i][0] * data[i][offset + 1];
+                        qk = data[i][0] * data[i][1];
                     }
                     else if (data[i][0] < (top_depth + pile_length)) {
-                        rs_bottom = rs_bottom + (data[i][0] - data[i - 1][0]) * data[i][offset + 1];
+                        qk = qk + (data[i][0] - data[i - 1][0]) * data[i][1];
                     }
                     else {
-                        rs_bottom = rs_bottom + ((top_depth + pile_length) - data[i - 1][0]) * data[i][offset + 1];
-                        rsk = rs_bottom - rs_top;
-                        rpk = data[i][offset + 2];
+                        qk = qk + ((top_depth + pile_length) - data[i - 1][0]) * data[i][1];
+                        var fa0 = data[i][2];
+                        var h = 40;
+                        if (pile_length < 40) {
+                            h = pile_length;
+                        }
+                        qr = m0 * lambda * (fa0 + k2 * r2 * (h - 3));
                         break;
                     }
                 }
-                return [rsk, rpk];
-            };
-
-            var calcu_pile2 = function (top_depth, pile_length, data, offset) {
-                var rt = 0;
-                var rs_top = 0;
-                var rs_bottom = 0;
-                for (i in data) {
-                    if (i == 0) {
-                        rs_top = data[i][0] * data[i][offset + 1] * data[i][5];
-                    }
-                    else if (data[i][0] < top_depth) {
-                        rs_top = rs_top + (data[i][0] - data[i - 1][0]) * data[i][offset + 1] * data[i][5];
-                    }
-                    else {
-                        rs_top = rs_top + (top_depth - data[i - 1][0]) * data[i][offset + 1] * data[i][5];
-                        break;
-                    }
-                }
-
-                for (i in data) {
-                    if (i == 0) {
-                        rs_bottom = data[i][0] * data[i][offset + 1] * data[i][5];
-                    }
-                    else if (data[i][0] < (top_depth + pile_length)) {
-                        rs_bottom = rs_bottom + (data[i][0] - data[i - 1][0]) * data[i][offset + 1] * data[i][5];
-                    }
-                    else {
-                        rs_bottom = rs_bottom + ((top_depth + pile_length) - data[i - 1][0]) * data[i][offset + 1] * data[i][5];
-                        rt = rs_bottom - rs_top;
-                        break;
-                    }
-                }
-                return rt;
+                return [qk - qk_top, qr];
             };
 
 
@@ -432,103 +325,27 @@
                 //var myselect=document.getElementById("holes");
                 //var selectHole=myselect.options[myselect.selectedIndex].text;
 
-                var pile_type = $obj.find(".piletype_select:first").find("option:selected").text();
-                var side_or_thickness = Number($obj.find("input[name='side_or_thickness']:first").val());
                 var diameter = Number($obj.find("input[name='diameter']:first").val());
                 var pile_length = Number($obj.find("input[name='pile_length']:first").val());
                 var top_depth = Number($obj.find("input[name='top_depth']:first").val());
                 var top_level = Number($obj.find("input[name='top_level']:first").val());
                 var bottom_depth = top_depth + pile_length;
 
-                var hole_level = hole.elevation;
                 var bottom_level = top_level - pile_length;
                 var data = buildData();
-                var perimeter = 0;
-                var area = 0;
-                var Rsk = 0;
-                var Rpk = 0;
-                var Rk = 0;
-                var Rd = 0;
-                var Ra = 0;
-                var Rtd = 0;
-                var offset = 0;
-                var Gp = 0;
 
-                switch (pile_type) {
-                    case "预制方桩":
-                        offset = 0;
-                        perimeter = side_or_thickness * 4 * 0.001;
-                        area = side_or_thickness * side_or_thickness * 0.001 * 0.001;
-                        break;
-                    case "PHC管桩":
-                        offset = 0;
-                        perimeter = diameter * Math.PI * 0.001;
-                        area = diameter * diameter * Math.PI * 0.25 * 0.001 * 0.001;
-                        break;
-                    case "钻孔灌注桩":
-                        offset = 2;
-                        perimeter = diameter * Math.PI * 0.001;
-                        area = diameter * diameter * Math.PI * 0.25 * 0.001 * 0.001;
-                        break;
-                    case "闭口钢管桩":
-                        offset = 0;
-                        perimeter = diameter * Math.PI * 0.001;
-                        area = diameter * diameter * Math.PI * 0.25 * 0.001 * 0.001;
-                        break;
-                    case "抗拔预制方桩":
-                        offset = 0;
-                        perimeter = side_or_thickness * 4 * 0.001;
-                        area = side_or_thickness * side_or_thickness * 0.001 * 0.001;
-                        break;
-                    case "抗拔钻孔灌注桩":
-                        offset = 2;
-                        perimeter = diameter * Math.PI * 0.001;
-                        area = diameter * diameter * Math.PI * 0.25 * 0.001 * 0.001;
-                        break;
-                }
-                Rsk = calcu_pile(top_depth, pile_length, data, offset)[0] * perimeter;
-                Rpk = calcu_pile(top_depth, pile_length, data, offset)[1] * area;
-                Rk = Rsk + Rpk;
-                var Pp = Rpk / Rk;
-                var rs = 2;
-                var rp = 2;
-                var rs_arr = [2.09, 2.16, 2.18, 2.13, 2.03, 1.88, 1.73];
-                var rp_arr = [1.08, 1.20, 1.37, 1.61, 1.93, 2.34, 2.83];
-                var n = Math.floor(Pp / 0.05) - 1;
-                if (n <= 0) {
-                    n = 0;
-                    rs = rs_arr[n];
-                    rp = rp_arr[n];
-                }
-                else if (n >= 6) {
-                    n = 6;
-                    rs = rs_arr[n];
-                    rp = rp_arr[n];
-                }
-                else {
-                    rs = (Pp - (n + 1) * 0.05) / 0.05 * (rs_arr[n + 1] - rs_arr[n]) + rs_arr[n];
-                    rp = (Pp - (n + 1) * 0.05) / 0.05 * (rp_arr[n + 1] - rp_arr[n]) + rp_arr[n];
-                }
-                Rd = Rsk / rs + Rpk / rp;
-                Ra = Rk / 2.0;
-                Gp = area * pile_length * (25 - 10);
-                Rtd = calcu_pile2(top_depth, pile_length, data, offset) * perimeter / 2.0 + Gp;
+                var u = diameter * Math.PI * 0.001;
+                var ap = diameter * diameter * Math.PI * 0.25 * 0.001 * 0.001;
+                var res = calcu_pile(top_depth, pile_length, data);
+                console.log(res[1] * ap);
+                var Ra = res[0] * u * 0.5 + res[1] * ap;
 
                 $obj.find("input[name='top_depth']").val(top_depth.toFixed(2));
                 $obj.find("td.bottom_depth:first").text(bottom_depth.toFixed(2));
                 $obj.find("input[name='top_level']").val(top_level.toFixed(2));
                 $obj.find("td.bottom_level:first").text(bottom_level.toFixed(1));
+                $obj.find(".Ra:first").text(Ra.toFixed(1));
 
-                if (pile_type.match("抗拔")) {
-                    $obj.find(".Rtd:first").text(Rtd.toFixed(1));
-                }
-                else {
-                    $obj.find(".Rsk:first").text(Rsk.toFixed(1));
-                    $obj.find(".Rpk:first").text(Rpk.toFixed(1));
-                    $obj.find(".Rk:first").text(Rk.toFixed(1));
-                    $obj.find(".Rd:first").text(Rd.toFixed(1));
-                    $obj.find(".Ra:first").text(Ra.toFixed(1));
-                }
             };
             //输入桩顶埋深，实时计算桩顶标高
             $("input[name='top_depth']:first").bind('input', function () {

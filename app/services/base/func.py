@@ -11,25 +11,6 @@
 # -------------------------------------------------------------------------------
 import math
 
-
-class AcPoint:
-    def __init__(self, x=0.0, y=0.0, z=0.0):
-        self.x = x
-        self.y = y
-        self.z = z
-
-    def offset(self, ox=0, oy=0, oz=0):
-        return AcPoint(self.x + ox, self.y + oy, self.z + oz)
-
-    def scale(self, sx=1, sy=1, sz=1):
-        return AcPoint(self.x * sx, self.y * sy, self.z * sz)
-
-    def __str__(self):
-        return "(x=%.4f,y=%.4f)" % (self.x, self.y)
-
-    __repr__ = __str__
-
-
 class SuperList(list):
     def __init__(self, obj):
         super(SuperList, self).__init__()

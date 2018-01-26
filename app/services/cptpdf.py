@@ -1,4 +1,4 @@
-# -*-coding:utf-8-*-
+﻿# -*-coding:utf-8-*-
 # -------------------------------------------------------------------------------
 # Name:
 # Purpose:     gen cpt pdf
@@ -22,8 +22,8 @@ from reportlab.platypus import PageBreak
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 
 pdfmetrics.registerFont(UnicodeCIDFont('STSong-Light'))
-pdfmetrics.registerFont(TTFont('SIMSUN', 'SIMSUN.ttc'))
-pdfmetrics.registerFont(TTFont('SIMHEI', 'SIMHEI.ttf'))
+pdfmetrics.registerFont(TTFont('SIMSUN', 'simsun.ttc'))
+pdfmetrics.registerFont(TTFont('SIMHEI', 'simhei.ttf'))
 
 
 def export2pdf(holes, probe, projectNo):

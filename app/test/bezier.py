@@ -9,14 +9,14 @@
 # date:         2017-10-20
 # copyright:    copyright  2017 Xu, Aiwu
 # -------------------------------------------------------------------------------
-from app.services.base.func import AcPoint
+from app.services.geometry.point import Point
 
 
 def createCurve(originCount, *originPoint):
-    # 控制点收缩系数 ，经调试0.6较好，AcPoint是opencv的，可自行定义结构体(x, y)
+    # 控制点收缩系数 ，经调试0.6较好，Point是opencv的，可自行定义结构体(x, y)
     curvePoint = []
     scale = 0.6
-    midpoints = [AcPoint() for i in range(originCount)]
+    midpoints = [Point() for i in range(originCount)]
     # 生成中点
     for i in range(originCount):
         nexti = (i + 1) % originCount
@@ -24,11 +24,11 @@ def createCurve(originCount, *originPoint):
         midpoints[i].y = (originPoint[i].y + originPoint[nexti].y) / 2.0
 
         # 平移中点
-    extrapoints = [AcPoint() for i in range(2 * originCount)]
+    extrapoints = [Point() for i in range(2 * originCount)]
     for i in range(originCount):
         nexti = (i + 1) % originCount
         backi = (i + originCount - 1) % originCount
-        midinmid = AcPoint()
+        midinmid = Point()
         midinmid.x = (midpoints[i].x + midpoints[backi].x) / 2.0
         midinmid.y = (midpoints[i].y + midpoints[backi].y) / 2.0
         offsetx = originPoint[i].x - midinmid.x
@@ -50,7 +50,7 @@ def createCurve(originCount, *originPoint):
         extrapoints[extranexti].x = originPoint[i].x + addx
         extrapoints[extranexti].y = originPoint[i].y + addy
 
-    controlPoint = [AcPoint() for i in range(4)]
+    controlPoint = [Point() for i in range(4)]
     # 生成4控制点，产生贝塞尔曲线
     for i in range(originCount - 1):
         controlPoint[0] = originPoint[i]
@@ -66,7 +66,7 @@ def createCurve(originCount, *originPoint):
             py = bezier3funcY(u, controlPoint)
             # u的步长决定曲线的疏密
             u -= 0.005
-            tempP = AcPoint(px, py)
+            tempP = Point(px, py)
             # 存入曲线点
             curvePoint.append(tempP)
     return curvePoint

@@ -9,7 +9,7 @@
 # date:         2016-08-13
 # copyright:    copyright  2016 Xu, Aiwu
 # -------------------------------------------------------------------------------
-import pyodbc
+import pypyodbc
 
 from flask import request, render_template, redirect
 
@@ -26,7 +26,7 @@ def mdb2cpt():
             print('success!')
         else:
             f = request.files['file']
-            cnxn = pyodbc.connect(
+            cnxn = pypyodbc.connect(
                 r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=' + f.path + ';UID=admin;PWD=;')
             cursor = cnxn.cursor()
             cursor.execute("SELECT project_name,project_nameing FROM base")

@@ -20,7 +20,7 @@
         </div>
         <div id="tab2" class="tab_content" style="display: block; ">
             <div class="row">
-                <div id="svgContainer" class="col-sm-12" align="center"></div>
+                <div id="svgContainer" class="col-sm-12" align="center" style="overflow-x:auto ;max-height:600px"></div>
             </div>
         </div>
     </div>
@@ -42,39 +42,40 @@
          A3 PAPER
          */
         $("#svgContainer").empty();
-        let scale = 100 * (96 / 2.54);
-        let scaleX = {{ paper.scale.x }};
-        let scaleY = {{ paper.scale.y }};
-        let offsetX = {{paper.offset.x}};
-        let offsetY = {{paper.offset.y}};
+        let scale = 96 / 25.4;
+        let scaleX = 1;
+        let scaleY = 1;
+        let offsetX = {{section.paper.offset.x}};
+        let offsetY = {{section.paper.offset.y}};
 
         //生成svg root
+        //.attr('viewBox', '0 0 1600 1200').attr("preserveAspectRatio", "xMinYMin meet");
+        // .attr("overflow-x", "scroll").attr("overflow-y", "scroll");
         let paper = d3.select("#svgContainer").append('svg');
         paper.attr('id', 'section')
-            .attr('width', '100%')
-            .attr('height', '100%')
-            .attr('viewBox', '0 0 1600 1200')
-            .attr("overflow-x", "scroll")
-            .attr("overflow-y", "scroll")
-            .attr("preserveAspectRatio", "xMinYMin meet");
-
+            .attr('width', 1600)
+            .attr('height', 1200);
 
         //画标题
         let head_layer = paper.append('g');
-        head_layer.attr('id', 'head_layer').attr('text-anchor', 'middle');
+        head_layer.attr('id', 'head_layer').style({'text-anchor': 'middle', 'font-size': 24});
 
-        let title = head_layer.append('text');
-        title.attr('x', '50%').attr('y', 25).attr('font-size', 20);
-        title.text("工程地质剖面图");
 
-        let section_name = head_layer.append('text');
-        section_name.attr('x', '50%').attr('y', 50).attr('font-size', 20);
-        section_name.text("{{ section.name }}--{{ section.name }}'");
+        head_layer.append('text')
+            .text("工程地质剖面图")
+            .attr('x', '50%')
+            .attr('y', 25);
 
-        let scale_str = head_layer.append('text');
-        scale_str.attr('x', '50%').attr('y', 75).attr('font-size', 20);
-        scale_str.text("水平 1：" + scaleX + "    垂直1：" + scaleY);
 
+        head_layer.append('text')
+            .text("{{ section.name}}\u2015{{ section.name }}'")
+            .attr('x', '50%')
+            .attr('y', 50);
+
+        head_layer.append('text')
+            .text("水平 1：{{ section.paper.scale.x }} 垂直1：{{ section.paper.scale.y }}")
+            .attr('x', '50%')
+            .attr('y', 75);
 
         paper.append('rect').attr('x', 0)
             .attr('y', 0)
@@ -89,6 +90,16 @@
         let scale_layer = paper.append('g');
         scale_layer.attr('id', 'scale_layer');
         plotting_scale(15, layer = scale_layer);
+
+
+        function pt_res(point, ox = 0, oy = 0) {
+            var x = offsetX + point.split(',')[0] / scaleX;
+            var y = offsetY - point.split(',')[1] / scaleY;
+
+            x = parseInt((x + ox) * scale);
+            y = parseInt((y + oy) * scale);
+            return {'x': x, 'y': y};
+        }
 
         function plotting_scale(n, layer) {
             for (var i = 1; i < n; i++) {
@@ -125,81 +136,123 @@
 
         }
 
-        let x1, y1, x2, y2;
-
         /*画勘探孔 */
-        let hole_layer = paper.append('g');
-        hole_layer.attr('id', 'hole_layer');
-        {% for hLine in hLines %}
-            x1 = offsetX + '{{ hLine[0].x }}' / scaleX;
-            y1 = offsetY - '{{ hLine[0].y }}' / scaleY;
-            x2 = offsetX + '{{ hLine[1].x }}' / scaleX;
-            y2 = offsetY - '{{ hLine[1].y }}' / scaleY;
-            holeName = hole_layer.append('text');
-            holeName.text('{{ section.holes[loop.index0].holeName }}');
-            holeName.attr('x', parseInt(x1 * scale))
-                .attr('y', parseInt(0.022 * scale))
-                .attr('font-size', "20")
-                .attr('text-anchor', 'middle');
+        let hole_group = paper.append('g');
+        hole_group.attr('id', 'hole_layer').style({'font-size': 20, 'text-anchor': 'middle'});
+        {% for line in hLines %}
+            var holeName = '{{ section.holes[loop.index0].holeName }}';
+            var elevation = '{{"%.2f" %section.holes[loop.index0].elevation }}';
+            pt1 = pt_res('{{ line.pt1 }}', 0, -10);
 
-            hole_layer.append('line')
-                .attr('x1', parseInt(x1 * scale))
-                .attr('y1', parseInt(y1 * scale))
-                .attr('x2', parseInt(x2 * scale))
-                .attr('y2', parseInt(y2 * scale))
+            pt2 = pt_res('{{ line.pt1 }}', -5, -9);
+            pt3 = pt_res('{{ line.pt1 }}', 5, -9);
+
+            pt4 = pt_res('{{ line.pt1 }}', 0, -4);
+
+            pt5 = pt_res('{{ line.pt1 }}');
+            pt6 = pt_res('{{ line.pt2 }}');
+
+            hole_group.append('text')
+                .text(holeName)
+                .attr('x', pt1.x)
+                .attr('y', pt1.y);
+
+            hole_group.append('line')
+                .attr('x1', pt2.x)
+                .attr('y1', pt2.y)
+                .attr('x2', pt3.x)
+                .attr('y2', pt3.y)
+                .attr('stroke', "#000")
+                .attr('stroke-width', 1);
+
+            hole_group.append('text')
+                .text(elevation)
+                .attr('x', pt4.x)
+                .attr('y', pt4.y);
+
+            hole_group.append('line')
+                .attr('x1', pt5.x)
+                .attr('y1', pt5.y)
+                .attr('x2', pt6.x)
+                .attr('y2', pt6.y)
                 .attr('stroke', "#000")
                 .attr('stroke-width', 2);
         {% endfor %}
 
-        /*画层位线 */
-        let curve_layer = paper.append('g');
-        curve_layer.attr('id', 'curve_layer');
-        {% for layer in layers %}
-            {% for line in layer.top_curve.get_lines() %}
-                x1 = offsetX + {{line.pt1.x}}/scaleX;
-                y1 = offsetY - {{line.pt1.y}}/scaleY;
-                x2 = offsetX + {{line.pt2.x}}/scaleX;
-                y2 = offsetY - {{line.pt2.y}}/scaleY;
-                curve_layer.append('line')
-                    .attr('x1', parseInt(x1 * scale))
-                    .attr('y1', parseInt(y1 * scale))
-                    .attr('x2', parseInt(x2 * scale))
-                    .attr('y2', parseInt(y2 * scale))
-                    .attr('stroke-width', 1).attr('stroke', 'black');
+        /*画层位线，按path连接 */
+        let curve_group = paper.append('g');
+        curve_group.attr('id', 'curve_group');
+        var points = '';
+        {% for curve in curves[0:-1] %}
+            var con_str = ' M';
+            {% for pt in curve.get_points() %}
+                pt = pt_res('{{ pt }}');
+                {% if loop.index0>0 %}
+                    con_str = ' L';
+                {% endif %}
+                points = points + con_str + pt.x + ',' + pt.y;
             {% endfor %}
         {% endfor %}
+        curve_group.append('path')
+            .attr('d', points)
+            .attr('stroke-width', 1).attr('stroke', 'black').attr('fill', 'None');
+
+
+        /* 按直线连接 */
+        {#            {% for line in curve.get_lines() %}
+                        x1 = offsetX + {{line.pt1.x}}/scaleX;
+                        y1 = offsetY - {{line.pt1.y}}/scaleY;
+                        x2 = offsetX + {{line.pt2.x}}/scaleX;
+                        y2 = offsetY - {{line.pt2.y}}/scaleY;
+                        curve.append('line')
+                            .attr('x1', parseInt(x1 * scale))
+                            .attr('y1', parseInt(y1 * scale))
+                            .attr('x2', parseInt(x2 * scale))
+                            .attr('y2', parseInt(y2 * scale))
+                            .attr('stroke-width', 1).attr('stroke', 'black');
+                    {% endfor %}#}
+
 
         /*画填充斜线 */
-        let flap_layer = paper.append('g');
-        flap_layer.attr('id', 'flap_layer');
-        {% for line in lines %}
-            x1 = offsetX + {{line.pt1.x}};
-            y1 = offsetY - {{line.pt1.y}};
-            x2 = offsetX + {{line.pt2.x}};
-            y2 = offsetY - {{line.pt2.y}};
-            flap_layer.append('line')
-                .attr('x1', parseInt(x1 * scale))
-                .attr('y1', parseInt(y1 * scale))
-                .attr('x2', parseInt(x2 * scale))
-                .attr('y2', parseInt(y2 * scale))
-                .attr('stroke', "red")
-                .attr('stroke-width', 1);
+        let fill_group = paper.append('g');
+        fill_group.attr('id', 'fill_layer');
+        {% for fill in fills %}
+            var points = '';
+            {% for line in fill %}
+                pt1 = pt_res('{{ line.pt1 }}');
+                pt2 = pt_res('{{ line.pt2 }}');
+                points = points + ' M' + pt1.x + ',' + pt1.y + ' L' + pt2.x + ',' + pt2.y;
+            {% endfor %}
+            fill_group.append('path').attr('id', 'fill_{{ section.layers[loop.index0].layerNo }}')
+                .attr('d', points)
+                .attr('stroke-width', 0.25).attr('stroke', 'red').attr('fill', 'None');
         {% endfor %}
 
-
-        /*画层号 */
-        let layerNo_layer = paper.append('g');
-        layerNo_layer.attr('id', 'layerNo_layer');
-        {% for layer in layers[0:-1] %}
-            {% set outer_loop=loop.index0 %}
-            {% for hole in section.holes %}
-                {% if hole.layers|length>outer_loop and hole.layers[outer_loop].thickness>0%}
-                    {% set x0=section.dss[loop.index0] %}
-                    x = offsetX + {{x0}}/scaleX+0.005;
-                    {% if loop.index0<section.holes|length-1 %}
-                        {% set Bhole=section.holes[loop.index0+1] %}
-                        {% if Bhole.layers|length>outer_loop %}
-                            {% if Bhole.layers[outer_loop].thickness==0  %}
+        {#
+                /*画层号 */
+                let layerNo_layer = paper.append('g');
+                layerNo_layer.attr('id', 'layerNo_layer');
+                {% for layer in layers[0:-1] %}
+                    {% set outer_loop=loop.index0 %}
+                    {% for hole in section.holes %}
+                        {% if hole.layers|length>outer_loop and hole.layers[outer_loop].thickness>0%}
+                            {% set x0=section.dss[loop.index0] %}
+                            x = offsetX + {{x0}}/scaleX+0.005;
+                            {% if loop.index0<section.holes|length-1 %}
+                                {% set Bhole=section.holes[loop.index0+1] %}
+                                {% if Bhole.layers|length>outer_loop %}
+                                    {% if Bhole.layers[outer_loop].thickness==0  %}
+                                        var layerNo = layerNo_layer.append('text');
+                                        layerNo.text("{{ layer.layerNo }}");
+                                        y1 = offsetY - '{{ layer.top_curve.x2y(x0).y}}' / scaleY;
+                                        y2 = offsetY - '{{ layer.bottom_curve.x2y(x0).y}}' / scaleY;
+                                        y = (y1 + y2) / 2;
+                                        layerNo.attr('x', parseInt(x * scale))
+                                            .attr('y', parseInt(y * scale) + 10)
+                                            .attr('font-size', "20");
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
                                 var layerNo = layerNo_layer.append('text');
                                 layerNo.text("{{ layer.layerNo }}");
                                 y1 = offsetY - '{{ layer.top_curve.x2y(x0).y}}' / scaleY;
@@ -210,20 +263,10 @@
                                     .attr('font-size', "20");
                             {% endif %}
                         {% endif %}
-                    {% else %}
-                        var layerNo = layerNo_layer.append('text');
-                        layerNo.text("{{ layer.layerNo }}");
-                        y1 = offsetY - '{{ layer.top_curve.x2y(x0).y}}' / scaleY;
-                        y2 = offsetY - '{{ layer.bottom_curve.x2y(x0).y}}' / scaleY;
-                        y = (y1 + y2) / 2;
-                        layerNo.attr('x', parseInt(x * scale))
-                            .attr('y', parseInt(y * scale) + 10)
-                            .attr('font-size', "20");
-                    {% endif %}
-                {% endif %}
 
-            {% endfor %}
-        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+        #}
 
 
 

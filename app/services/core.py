@@ -64,6 +64,10 @@ def find_sections(projectNo):
             accumulate_distance = accumulate_distance + last_distance
             section.items.append((hole, accumulate_distance))
             last_distance = distance
+    layers = find_layers(projectNo)
+    for section in sections:
+        LCOUNT = max(len(hole.layers) for hole in section.holes)
+        section.layers = layers[0:LCOUNT]
     return sections
 
 
@@ -368,7 +372,7 @@ def FindSiltLayers(projectNo):
     layers = find_layers(projectNo)
     for xLayer in layers:
         if xLayer.layerAge is None:
-            print('地质时代未输入，请补齐')
+            print('{0}地质时代未输入，请补齐'.format(xLayer.layerNo))
         elif xLayer.layerAge.startswith('Q4') and ('砂' in xLayer.layerName.split('夹')[0]):
             siltLayers.append(xLayer)
             # print('本工程的砂土层或砂质粉土层为：%s\t%s\t'%(xLayer.layerNo,xLayer.layerName))

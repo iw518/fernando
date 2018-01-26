@@ -1,8 +1,10 @@
 
 from app.services.core import *
 
-projectNo = 'K043-2015-5'
-sections = find_sections(projectNo)
-section = sections[10]
-section.set_paper()
-layers = section.draw_sectionLine(find_layers(projectNo))
+sections = find_sections('K205-2017')
+section = sections[int(1)]
+section = section
+paper = section.set_paper()
+curves = section.stroke()
+hLines = section.hLines
+fill = section.fill()

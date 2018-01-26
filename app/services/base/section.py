@@ -11,59 +11,88 @@
 # -------------------------------------------------------------------------------
 import math
 
-from app.services.base.func import AcPoint
+from app.services.base.hole import Hole
 from app.services.geometry.line import Line
-from .hole import Hole
+from app.services.geometry.point import Point
 
 
 class Paper:
     # unit mm
-    marginX = 10 / 1000
-    marginY = 15 / 1000
+    marginX = 20
+    marginY = 15
 
     def __init__(self, section, name='A3', width=420, height=297, orientation='H'):
         self.section = section
         self.name = name
-        self.width = width / 1000
-        self.height = height / 1000
+        self.width = width
+        self.height = height
         if orientation.capitalize() == 'V':
-            self.width = height / 1000
-            self.height = width / 1000
+            self.width = height
+            self.height = width
         self.orientation = orientation
+        self.sx = 1
+        self.sy = 1
 
     @property
     def lt(self):
         # unit m
         left = self.section.dss[0]
-        top = max([hole.elevation for hole, accumulate_distance in self.section._items])
-        return AcPoint(left, top)
+        top = self.section.top
+        return Point(left, top)
 
     @property
     def rb(self):
         # unit m
         right = self.section.dss[-1]
-        bottom = min([hole.elevation - hole.Dep for hole, accumulate_distance in self.section._items])
-        return AcPoint(right, bottom)
+        bottom = self.section.bottom
+        return Point(right, bottom)
 
     @property
     def scale(self):
-        sect_width = self.rb.x - self.lt.y
+        sect_width = (self.rb.x - self.lt.x) * 1000
         scale = sect_width / (self.width - self.marginX * 2)
         x = math.ceil(scale / 100) * 100
 
-        sect_height = self.lt.y - self.rb.y
+        sect_height = (self.lt.y - self.rb.y) * 1000
         scale = sect_height / (self.height - self.marginY * 2)
         y = math.ceil(scale / 100) * 100
-        return AcPoint(x, y)
+
+        self.sx = 1000 / x
+        self.sy = 1000 / y
+
+        return Point(x, y)
+
+    @property
+    def scale2(self):
+        sect_width = (self.rb.x - self.lt.x) * 1000
+        scale = sect_width / (self.width - self.marginX * 2)
+        x = math.ceil(scale / 100) * 100
+
+        sect_height = (self.lt.y - self.rb.y) * 1000
+        scale = sect_height / (self.height - self.marginY * 2)
+        y = math.ceil(scale / 100) * 100
+
+        self.sx = 1000 / x
+        self.sy = 1000 / y
+
+        return Point(x, y)
+
 
     @property
     def offset(self):
-        # unit m
-        sect_width = self.rb.x - self.lt.y
-        sect_height = self.lt.y - self.rb.y
-        x = self.width / 2 - sect_width / self.scale.x / 2
-        y = self.lt.y / self.scale.y + (self.height / 2 - sect_height / self.scale.y / 2)
-        return AcPoint(x, y)
+        # unit mm
+        # 中点坐标重合
+        # 剖面原始中心坐标x1,图纸中心坐标x0
+        x0 = self.width / 2
+        x1 = (self.lt.x + self.rb.x) * self.sx / 2
+
+        # 剖面原始中心y1,图纸中心坐标y0
+        y1 = ((-1) * self.lt.y * self.sy + (-1) * self.rb.y * self.sy) / 2
+        y0 = self.height / 2
+
+        x = x0 - x1
+        y = y0 - y1
+        return Point(x, y)
 
 
 class Section:
@@ -71,8 +100,17 @@ class Section:
         self.name = name
         self._items = []
         self._hlines = []
-        self._paper = Paper(self)
-        self._layers = []
+        self.paper = Paper(self)
+        self.__layers = None
+        self.curves = []
+
+    @property
+    def layers(self):
+        return self.__layers
+
+    @layers.setter
+    def layers(self, value):
+        self.__layers = value
 
     @property
     def items(self):
@@ -96,6 +134,7 @@ class Section:
     def top(self):
         # unit m
         top = max([hole.elevation for hole, accumulate_distance in self._items])
+
         return top
 
     def to_json(self):
@@ -111,39 +150,40 @@ class Section:
                 mydict['items'] = items
         return mydict
 
-    @property
-    def hLines(self):
-        self._hlines = []
-        for (hole, accumulate_distance) in self.items:
-            top = AcPoint()
-            bottom = AcPoint()
-            top.x = accumulate_distance
-            top.y = hole.elevation
-            bottom.x = accumulate_distance
-            bottom.y = top.y - hole.Dep
-            hLine = (top, bottom)
-            self._hlines.append(hLine)
-        return self._hlines
-
     def set_paper(self, name='A3', width=420, height=297, orientation='H'):
-        self._paper = Paper(self, name, width, height, orientation)
-        return self._paper
+        self.paper = Paper(self, name, width, height, orientation)
 
-    def draw_sectionLine(self, layers):
+    def plot_hole(self):
+        lines = []
+        for (hole, accumulate_distance) in self.items:
+            pt1 = Point(accumulate_distance, hole.elevation)
+            pt2 = pt1.offset(0, - hole.Dep)
+            lines.append(Line(pt1, pt2).scale(self.paper.sx, self.paper.sy))
+        return lines
+
+    def plot_scale(self):
+        lines = []
+        start_num = math.ceil(self.top)
+        self.paper.sy / 100
+        for (hole, accumulate_distance) in self.items:
+            pt1 = Point(accumulate_distance, hole.elevation)
+            pt2 = pt1.offset(0, - hole.Dep)
+            lines.append(Line(pt1, pt2).scale(self.paper.sx, self.paper.sy))
+        return lines
+
+    def __draw_sectionLine(self):
         HNUM = len(self.holes)
-        LCOUNT = max(len(hole.layers) for hole in self.holes)
-        layers = layers[0:LCOUNT]
-        extra_dist = 0.015 * self._paper.scale.x
+        LCOUNT = len(self.layers)
 
         # 第一部分：画地形线，即0层的层顶线
         hole_index = 0
-        layer = layers[0]
+        layer = self.layers[0]
         while hole_index <= HNUM - 1:
             # 1-1定义A孔
             aHole = self.holes[hole_index]
             ax = self.dss[hole_index]
             al = aHole.layers[0]
-            pt = AcPoint(ax, aHole.elevation)
+            pt = Point(ax, aHole.elevation)
             # 1-2添加A点
             layer.top_curve.append_point(pt)
             if hole_index == HNUM - 1:
@@ -157,34 +197,38 @@ class Section:
             if al.thickness > 0 and bl.thickness == 0:
                 x = (ax + 2 * bx) / 3
                 y = aHole.elevation
-                pt = AcPoint(x, y)
+                pt = Point(x, y)
                 layer.top_curve.append_point(pt)
             if al.thickness == 0 and bl.thickness > 0:
                 x = (2 * ax + bx) / 3
                 y = bHole.elevation
-                pt = AcPoint(x, y)
+                pt = Point(x, y)
                 layer.top_curve.append_point(pt)
 
         # 第二部分：画各层的层底线
         for layer_index in range(LCOUNT):
             # 初始化
             hole_index = 0
-            layer = layers[layer_index]
+            layer = self.layers[layer_index]
             # 将上层层底信息传递至下层层顶
             if layer_index >= 1:
-                layer.top_curve = layers[layer_index - 1].bottom_curve
+                layer.top_curve = self.layers[layer_index - 1].bottom_curve
             while hole_index <= HNUM - 1:
                 # 2-1定义A孔
                 aHole = self.holes[hole_index]
                 ax = self.dss[hole_index]
                 # (1)若A孔已到层底，直接跳到下一次循环，此处未考虑A孔与右侧孔存在层位相交错情况，日后可优化！！！
+
                 if layer_index > len(aHole.layers) - 1:
                     hole_index = hole_index + 1
                     continue
                 # (2)若A孔未到层底,：画A孔层底线
                 aLayer = aHole.layers[layer_index]
                 ay = aHole.elevation - aLayer.endDep
-                ptA = AcPoint(ax, ay)
+                ptA = Point(ax, ay)
+                if layer_index == len(aHole.layers) - 1:
+                    ptA.attr("bottom", True)
+                    print(ptA.attr("bottom"))
                 layer.bottom_curve.append_point(ptA)
                 if hole_index == HNUM - 1:
                     break
@@ -201,9 +245,9 @@ class Section:
                     else:
                         bl = bHole.layers[layer_index]
                         by = bHole.elevation - bl.endDep
-                        ptB = AcPoint(bx, by)
+                        ptB = Point(bx, by)
                         if aLayer.thickness > 0 and bl.thickness == 0:
-                            virtual_line = Line(ptA, AcPoint(bx, ay))
+                            virtual_line = Line(ptA, Point(bx, ay))
                             pt = layer.top_curve.intersect(virtual_line)
                             if not pt:
                                 x = (ax + 2 * bx) / 3
@@ -211,7 +255,7 @@ class Section:
                             layer.bottom_curve.append_point(pt)
                             layer.bottom_curve.concat(layer.top_curve.slice(pt, ptB))
                         if aLayer.thickness == 0 and bl.thickness > 0:
-                            virtual_line = Line(AcPoint(ax, by), ptB)
+                            virtual_line = Line(Point(ax, by), ptB)
                             pt = layer.top_curve.intersect(virtual_line)
                             if not pt:
                                 x = (2 * ax + bx) / 3
@@ -221,32 +265,54 @@ class Section:
                         if aLayer.thickness == 0 and bl.thickness == 0:
                             layer.bottom_curve.concat(layer.top_curve.slice(ptA, ptB))
                         break
-        self._layers = layers
-        return self._layers
 
-    def fill_layer(self):
-        lines = []
-        sx = 1 / self._paper.scale.x
-        sy = 1 / self._paper.scale.y
-        delta = 0.01
-        left = -int(math.ceil(self.top / delta)) - 1
-        right = int(math.ceil((self.dss[-1] - self.bottom) / delta)) + 3
-        for layer in self._layers:
-            top_curve = layer.top_curve.scale(sx, sy)
-            bottom_curve = layer.bottom_curve.scale(sx, sy)
+    def stroke(self):
+        DELTA = 15
+        self.__draw_sectionLine()
+        sx = 1000 / self.paper.scale.x
+        sy = 1000 / self.paper.scale.y
+        self.curves = []
+        for layer in self.layers:
+            # 按照比例尺缩放到纸质图中，单位mm
+            curve = layer.top_curve.scale(sx, sy)
+            # 插入左右延长线
+            pt1 = curve.get_points()[0]
+            pt2 = curve.get_points()[-1]
+            if pt1.attr('bottom'):
+                continue
+            else:
+                curve.insert_point(0, pt1.offset(-DELTA, 0))
+            if pt2.attr('bottom'):
+                continue
+            else:
+                curve.append_point(pt2.offset(DELTA, 0))
+            self.curves.append(curve)
+
+        self.curves.append(self.layers[-1].bottom_curve.scale(sx, sy))
+
+    def fill(self):
+        fills = []
+        delta = 10
+        sx = 1000 / self.paper.scale.x
+        sy = 1000 / self.paper.scale.y
+        left = -int(self.top * sy / delta) - 2
+        right = int((self.dss[-1] * sx - self.bottom * sy) / delta) + 2
+        for i in range(len(self.curves) - 1):
+            top_curve = self.curves[i]
+            bottom_curve = self.curves[i + 1]
+            fill = []
             for i in range(left, right):
-                silt_clay = Line(AcPoint(-1000, -1000 - delta * i), AcPoint(5000, 5000 - delta * i))
+                silt_clay = Line(Point(-1000, -1000 - delta * i), Point(1000, 1000 - delta * i))
                 pt1 = bottom_curve.intersect(silt_clay)
                 pt2 = top_curve.intersect(silt_clay)
-                if pt1 and pt2:
-                    line = Line(pt1, pt2)
-                    lines.append(line)
                 if (not pt1) and pt2:
                     x = top_curve.get_points()[0].x
-                    line = Line(silt_clay.x2y(x), pt2)
-                    lines.append(line)
-                if pt1 and (not pt2):
+                    pt1 = silt_clay.x2y(x)
+                elif pt1 and (not pt2):
                     x = top_curve.get_points()[-1].x
-                    line = Line(pt1, silt_clay.x2y(x))
-                    lines.append(line)
-        return lines
+                    pt2 = silt_clay.x2y(x)
+                if pt1 and pt2:
+                    line = Line(pt1, pt2)
+                    fill.append(line)
+            fills.append(fill)
+        return fills

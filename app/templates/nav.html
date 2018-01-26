@@ -13,7 +13,8 @@
                 </li>
                 <li><a href="{{ url_for('calc.liquefaction',projectNo=projectNo,_external=True) }}">液化判别</a></li>
                 <li><a href="{{ url_for('calc.natural_foundation',projectNo=projectNo,_external=True) }}">天然地基</a></li>
-                <li><a href="{{ url_for('calc.pile',projectNo=projectNo,_external=True) }}">桩基</a></li>
+                <li><a href="{{ url_for('calc.pile',projectNo=projectNo,_external=True) }}">桩基(房建规范)</a></li>
+                <li><a href="{{ url_for('calc.pile_bridge',projectNo=projectNo,_external=True) }}">桩基(公路规范)</a></li>
             </ul>
         </li>
         <li><a href="#"><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;成果图表</a>

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # encoding: utf-8
 # -------------------------------------------------------------------------------
 # version:      ??
@@ -142,7 +142,6 @@ def layerAnalysis():
         for xLayer in find_layers(projectNo):
             layerNo = xLayer.layerNo
             list1 = []
-            global layer_hole_elevation_list
             for hole in hole_list:
                 if hole.layers.find(layerNo):
                     if layerNo != hole.layers[-1].layerNo:

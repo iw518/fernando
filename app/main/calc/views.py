@@ -78,6 +78,7 @@ def pile():
     hole_list = find_holes_with_layer(projectNo, 1)
     hole_list.extend(find_holes_with_layer(projectNo, 2))
 
+
     if request.method == 'GET':
         layers = ExportLayers_Stat(projectNo)
         repeat_layerNolist = []
@@ -94,7 +95,29 @@ def pile():
                                layers=layers,
                                repeat_layerNolist=repeat_layerNolist
                                )
+    hole_list = find_holes_with_layer(projectNo, 1)
+    hole_list.extend(find_holes_with_layer(projectNo, 2))
     hole = extract_element(hole_list, 'holeName', request.form['hole_selected'])
+    return json.dumps(hole.to_json())
+
+
+@calc.route('/pile_bridge', methods=['POST', 'GET'])
+def pile_bridge():
+    print(request.args)
+    projectNo = request.args.get('projectNo')
+    hole_list = find_holes_with_layer(projectNo, 1)
+    hole_list.extend(find_holes_with_layer(projectNo, 2))
+
+    if request.method == 'GET':
+        layers = ExportLayers_Stat(projectNo)
+        return render_template('calc/pile_bridge.html',
+                               projectNo=projectNo,
+                               holes=[hole.holeName for hole in hole_list],
+                               manager=FindManager(projectNo),
+                               layers=layers
+                               )
+    hole = extract_element(hole_list, 'holeName', request.form['hole_selected'])
+    print(hole.holeName)
     return json.dumps(hole.to_json())
 
 
@@ -130,7 +153,7 @@ def pile():
 @before_req
 def liquefaction():
     projectNo = request.args.get('projectNo')
-    siltLayers = FindSiltLayers(find_layers(projectNo))
+    siltLayers = FindSiltLayers(projectNo)
     siltLayersStr = '、'.join('%s：%s' % (item.layerNo, item.layerName) for item in siltLayers)
     liqueHolesStr = '、'.join(xHole.holeName for xHole in find_liqueholes(projectNo))
     res = res_lique(projectNo)
